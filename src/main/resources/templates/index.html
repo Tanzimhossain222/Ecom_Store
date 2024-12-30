@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: Layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Home</title>
+</head>
+<body>
+
+<section>
+
+    <!-- Carousel Start -->
+    <div id="carouselExampleIndicators" class="carousel slide carousel-fade">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="image/ecom1.webp" class="d-block w-100" alt="ecom1" height="550px">
+            </div>
+
+            <div class="carousel-item">
+                <img src="image/ecom2.png" class="d-block w-100" alt="ecom2" height="550px">
+            </div>
+
+            <div class="carousel-item">
+                <img src="image/ecom4.webp" class="d-block w-100" alt="ecom4" height="550px">
+            </div>
+
+            <div class="carousel-item">
+                <img src="image/ecom3.webp" class="d-block w-100" alt="ecom3" height="550px">
+            </div>
+
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <!-- Carousel End -->
+
+    <!-- Category Section Start -->
+    <div class="container my-5">
+        <div class="row">
+            <p class="text-center fs-4 fw-bold">Shop by Category</p>
+
+            <div class="col-md-2">
+                <div class="card rounded-circle shadow-sm p-3 mb-5 bg-body-tertiary rounded ">
+                    <div class="card-body text-center">
+                        <img src="image/category_img/beauty.jpeg" width="65%" height="90px">
+                        <p class="mt-2 fw-bold small">Beauty</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card rounded-circle shadow-sm p-3 mb-5 bg-body-tertiary rounded ">
+                    <div class="card-body text-center">
+                        <img src="image/category_img/electronics.jpg" width="65%" height="90px">
+                        <p class="mt-2 fw-bold small">Electronics</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card rounded-circle shadow-sm p-3 mb-5 bg-body-tertiary rounded ">
+                    <div class="card-body text-center">
+                        <img src="image/category_img/laptop.jpg" width="65%" height="90px">
+                        <p class="mt-2 fw-bold small">Laptops</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card rounded-circle shadow-sm p-3 mb-5 bg-body-tertiary rounded ">
+                    <div class="card-body text-center">
+                        <img src="image/category_img/mobile.webp" width="65%" height="90px">
+                        <p class="mt-2 fw-bold small">Mobiles</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+    <!-- Category Section End -->
+
+    <!-- Latest Product Section Start -->
+    <div class="container my-5">
+        <div class="row">
+            <p class="text-center fs-4 fw-bold">Latest Products</p>
+
+            <!-- Product Card -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card shadow-sm bg-body-tertiary rounded h-100">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="image-container mb-3" style="height: 140px; display: flex; align-items: center; justify-content: center;">
+                            <img src="image/product_img/laptop.jpg" alt="HP Laptop" class="img-fluid rounded" style="max-height: 100%; max-width: 100%; object-fit: cover;">
+                        </div>
+                        <h5 class="fw-bold mt-auto">HP Laptop</h5>
+                        <p class="text-muted small">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <a href="#" class="btn btn-primary btn-sm mt-auto">View Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add More Product Cards -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card shadow-sm bg-body-tertiary rounded h-100">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="image-container mb-3" style="height: 140px; display: flex; align-items: center; justify-content: center;">
+                            <img src="image/product_img/mobile.webp" alt="Smartphone" class="img-fluid rounded" style="max-height: 100%; max-width: 100%; object-fit: cover;">
+                        </div>
+                        <h5 class="fw-bold mt-auto">Smartphone</h5>
+                        <p class="text-muted small">Experience the latest technology with this powerful smartphone.</p>
+                        <a href="#" class="btn btn-primary btn-sm mt-auto">View Details</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+</section>
+
+
+<!-- Custom CSS (Minimized) -->
+<style>
+    .category-container {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .category-item {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 2px solid #fff;
+    }
+
+    .category-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .category-item .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        text-align: center;
+    }
+
+    .category-item:hover .overlay {
+        opacity: 1;
+    }
+
+    .category-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+</style>
+
+</body>
+</html>
