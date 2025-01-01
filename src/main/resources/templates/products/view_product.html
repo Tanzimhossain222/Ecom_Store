@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: Layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Product Details</title>
+</head>
+<body>
+
+
+
+<section>
+    <div class="container mt-5 mb-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-4">
+                <div class="row g-4">
+
+                    <!-- Success or Error Messages -->
+                    <div class="col-12">
+                        <div class="alert alert-success text-center d-none" role="alert">
+                            Product added successfully to the cart!
+                        </div>
+                        <div class="alert alert-danger text-center d-none" role="alert">
+                            Something went wrong. Please try again.
+                        </div>
+                    </div>
+
+                    <!-- Product Image -->
+                    <div class="col-md-6 text-center">
+                        <img src="/image/product_img/laptop.jpg" alt="Product Image" class="img-fluid rounded shadow-sm" style="max-height: 350px;">
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="col-md-6">
+                        <h2 class="fw-bold mb-3">Dummy Product Title</h2>
+                        <p class="text-secondary mb-4">This is a dummy description for the product. It provides essential details to inform the customer.</p>
+                        <hr>
+                        <p class="mb-2">
+                            <strong>Status:</strong> <span class="badge bg-success">Available</span>
+                        </p>
+                        <p class="mb-2"><strong>Category:</strong> Electronics</p>
+                        <p class="mb-4"><strong>Policy:</strong> 7 Days Replacement & Return</p>
+                        <h4 class="text-danger fw-bold mb-4">
+                            <i class="fas fa-dollar-sign"></i> 500.00
+                            <span class="fs-6 text-decoration-line-through text-secondary ms-2">$600.00</span>
+                            <span class="fs-6 text-success ms-2">16% off</span>
+                        </h4>
+                        <hr>
+
+                        <!-- Features Section -->
+                        <div class="row text-center mb-4">
+                            <div class="col-4">
+                                <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+                                <p class="small mt-2">Cash On Delivery</p>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-undo-alt fa-2x text-danger"></i>
+                                <p class="small mt-2">Return Available</p>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-truck-moving fa-2x text-primary"></i>
+                                <p class="small mt-2">Free Shipping</p>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2">
+                            <a href="/signin" class="btn btn-primary btn-lg">
+                                <i class="fas fa-cart-plus"></i> Add To Cart
+                            </a>
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                <i class="fas fa-box"></i> Out of Stock
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

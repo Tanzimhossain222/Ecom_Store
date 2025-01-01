@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: Layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Add Category</title>
+</head>
+<body>
+<section>
+    <div class="container-fluid p-5 mt-5">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card card-sh">
+                    <div class="card-header text-center">
+                        <p class="fs-4">Add Category</p>
+                        <!-- Success Message -->
+                        <p class="text-success fw-bold" style="display: none;">Success message here</p>
+                        <!-- Error Message -->
+                        <p class="text-danger fw-bold" style="display: none;">Error message here</p>
+                    </div>
+                    <div class="card-body">
+                        <form action="#" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="category">Enter Category</label>
+                                <input type="text" id="category" name="name" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label>Status</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="active" value="true" name="isActive" checked>
+                                    <label class="form-check-label" for="active">Active</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="inactive" value="false" name="isActive">
+                                    <label class="form-check-label" for="inactive">Inactive</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="file">Upload Image</label>
+                                <input type="file" id="file" name="file" class="form-control">
+                            </div>
+                            <button class="btn btn-primary col-md-12 mt-2">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card card-sh">
+                    <div class="card-header text-center fs-4">Category Details</div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Sl No</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Image</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>Sample Category</td>
+                                <td>Active</td>
+                                <td><img src="sample-image.jpg" width="50" height="50" alt="Category Image"></td>
+                                <td>
+                                    <a href="#" class="btn btn-primary btn-sm">Edit</a>
+                                    <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-4">Total Categories: 10</div>
+                            <div class="col-md-6">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+
+</html>

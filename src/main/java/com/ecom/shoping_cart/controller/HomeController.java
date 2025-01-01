@@ -13,12 +13,22 @@ public class HomeController {
 
     @GetMapping("/login")
     public String login(){
-        return "login";
+        return "auth/login";
     }
 
     @GetMapping("/register")
     public String register(){
-        return "register";
+        return "auth/register";
+    }
+
+    @GetMapping("/products")
+    public String product(){
+        return "products/index";
+    }
+
+    @GetMapping("/product/{id}")
+    public String viewProduct(){
+        return "products/view_product";
     }
 
 }

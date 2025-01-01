@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: Layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Product Page</title>
+</head>
+<body>
+<section>
+    <!-- Search Bar -->
+    <div class="container-fluid bg-primary text-white py-4" style="margin-top: 60px;">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form action="/products" method="get" class="d-flex">
+                    <input type="text" class="form-control me-2" name="ch" placeholder="Search for products...">
+                    <button class="btn btn-light">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories and Products -->
+
+    <!-- Categories and Products -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Categories Sidebar -->
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="fw-bold">Categories</h5>
+                        <ul class="list-group list-group-flush">
+                            <a href="#" class="list-group-item list-group-item-action">Electronics</a>
+                            <a href="#" class="list-group-item list-group-item-action">Clothing</a>
+                            <a href="#" class="list-group-item list-group-item-action">Shoes</a>
+                            <a href="#" class="list-group-item list-group-item-action">Books</a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div class="col-md-9">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="text-center mb-4 fw-bold">Products</h3>
+                        <div class="row g-4">
+                            <!-- Single Product -->
+                            <div class="col-sm-6 col-md-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden;">
+                                        <img src="image/product_img/laptop.jpg" alt="Laptop" class="img-fluid">
+                                    </div>
+                                    <div class="card-body text-center d-flex flex-column">
+                                        <h5 class="card-title fw-bold">Laptop</h5>
+                                        <p class="card-text text-muted flex-grow-1">High-performance laptop for all your needs.</p>
+                                        <p class="card-text fw-bold mb-3">
+                                            $900 <span class="text-success ms-2">20% off</span>
+                                        </p>
+                                        <a href="/product/1" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-info-circle"></i> View Product Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Duplicate Product -->
+                            <div class="col-sm-6 col-md-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden;">
+                                        <img src="image/product_img/mobile.webp" alt="Mobile" class="img-fluid">
+                                    </div>
+                                    <div class="card-body text-center d-flex flex-column">
+                                        <h5 class="card-title fw-bold">Mobile Phone</h5>
+                                        <p class="card-text text-muted flex-grow-1">Latest smartphone with cutting-edge features.</p>
+                                        <p class="card-text fw-bold mb-3">
+                                            $700 <span class="text-success ms-2">15% off</span>
+                                        </p>
+                                        <a href="/product/2" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-info-circle"></i> View Product Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Add more cards as needed -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</section>
+
+</body>
+</html>
