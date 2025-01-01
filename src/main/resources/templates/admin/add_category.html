@@ -16,13 +16,20 @@
                 <div class="card card-sh">
                     <div class="card-header text-center">
                         <p class="fs-4">Add Category</p>
-                        <!-- Success Message -->
-                        <p class="text-success fw-bold" style="display: none;">Success message here</p>
-                        <!-- Error Message -->
-                        <p class="text-danger fw-bold" style="display: none;">Error message here</p>
+
+                        <th:block  th:if="${session.successMsg}" >
+                            <p class="text-success fw-bold" th:text="${session.successMsg}" style="display: block;"></p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+
+                        <th:block  th:if="${session.errorMsg}" >
+                            <p class="text-danger fw-bold" th:text="${session.errorMsg}" style="display: block;"></p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+
                     </div>
                     <div class="card-body">
-                        <form action="#" method="post" enctype="multipart/form-data">
+                        <form action="/admin/saveCategory" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="category">Enter Category</label>
                                 <input type="text" id="category" name="name" class="form-control">
