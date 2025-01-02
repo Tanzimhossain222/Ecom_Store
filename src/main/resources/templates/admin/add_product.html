@@ -16,13 +16,24 @@
                 <div class="card card-sh">
                     <div class="card-header text-center">
                         <p class="fs-4">Add Product</p>
-                        <!-- Success Message -->
-                        <p class="text-success fw-bold" style="display: none;">Success message here</p>
-                        <!-- Error Message -->
-                        <p class="text-danger fw-bold" style="display: none;">Error message here</p>
+
+                        <a href="/admin/" class="text-decoration-none"><i
+                                class="fa-solid fa-arrow-left"></i> Back</a>
+
+                        <th:block th:if="${session.successMsg}">
+                            <p class="text-success fw-bold" th:text="${session.successMsg}" style="display: block;"></p>
+
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+
+                        <th:block th:if="${session.errorMsg}">
+                            <p class="text-danger fw-bold" th:text="${session.errorMsg}" style="display: block;"></p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+
                     </div>
                     <div class="card-body">
-                        <form action="#" method="post" enctype="multipart/form-data">
+                        <form action="/admin/saveProduct" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="title">Enter Title</label>
                                 <input type="text" id="title" name="title" class="form-control">
@@ -35,8 +46,7 @@
                                 <label for="category">Category</label>
                                 <select id="category" class="form-control" name="category">
                                     <option>--select--</option>
-                                    <option>Category 1</option>
-                                    <option>Category 2</option>
+                                    <option th:each="c:${categories}">[[${c.name}]] </option>
                                 </select>
                             </div>
                             <div class="mb-3">
@@ -57,7 +67,7 @@
                             <div class="row">
                                 <div class="mb-3 col">
                                     <label for="stock">Enter Stock</label>
-                                    <input type="text" id="stock" name="stock" class="form-control">
+                                    <input type="number" id="stock" name="stock" class="form-control">
                                 </div>
                                 <div class="mb-3 col">
                                     <label for="file">Upload Image</label>

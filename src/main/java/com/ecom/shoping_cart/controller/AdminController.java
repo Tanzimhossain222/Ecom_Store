@@ -1,7 +1,9 @@
 package com.ecom.shoping_cart.controller;
 
 import com.ecom.shoping_cart.model.Category;
+import com.ecom.shoping_cart.model.Product;
 import com.ecom.shoping_cart.service.CategoryService;
+import com.ecom.shoping_cart.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -24,8 +26,13 @@ public class AdminController {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    ProductService productService;
+
     @GetMapping("addProduct")
-    public String addProducts(){
+    public String addProducts(Model m){
+        List<Category> categories = categoryService.getAllCategory();
+        m.addAttribute("categories", categories);
         return "admin/add_product";
     }
 
@@ -140,6 +147,72 @@ public class AdminController {
         }
 
         return "redirect:/admin/category";
+    }
+
+
+    @PostMapping("/saveProduct")
+    public  String saveProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile file, HttpSession session){
+
+        String fileName = file != null && !file.isEmpty() ? file.getOriginalFilename() : "default.jpg";
+        product.setImage(fileName);
+
+        try {
+            Product saveProduct = productService.saveProduct(product);
+
+            if (saveProduct != null) {
+                // Save the file to the server
+                if (file != null && !file.isEmpty()) {
+                    try {
+                        File saveDir = new ClassPathResource("static/image/product_img").getFile();
+                        if (!saveDir.exists()) {
+                            saveDir.mkdirs();
+                        }
+
+                        Path path = Path.of(saveDir.getAbsolutePath(), fileName);
+                        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        session.setAttribute("errorMsg", "Product saved, but file upload failed: " + e.getMessage());
+                        return "redirect:/admin/addProduct";
+                    }
+                }
+
+                session.setAttribute("successMsg", "Product added successfully");
+            } else {
+                session.setAttribute("errorMsg", "Failed to save product");
+            }
+
+        } catch (Exception e) {
+            session.setAttribute("errorMsg", "An unexpected error occurred: " + e.getMessage());
+        }
+
+        return "admin/add_product";
+    }
+
+
+    @GetMapping("/products")
+    public String loadViewProduct(Model m){
+        List<Product> products = productService.getAllProduct();
+
+        if (products == null) {
+            m.addAttribute("errorMsg", "No products found");
+            return "admin/products";
+        }
+
+
+        m.addAttribute("products", products);
+        return "admin/products";
+    }
+
+    @GetMapping("/product/delete")
+    public String deleteProduct (@RequestParam("id") Integer id, HttpSession session){
+
+        if (productService.deleteProduct(id)) {
+            session.setAttribute("successMsg", "Product deleted successfully");
+        } else {
+            session.setAttribute("errorMsg", "Failed to delete product");
+        }
+
+        return "redirect:/admin/products";
     }
 
     @GetMapping("/")

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: Layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Products</title>
+</head>
+<body>
+<section>
+
+    <div class="container-fluid mt-4 p-3">
+        <div class="row">
+            <p class="text-center fs-3 mt-4">All Products</p>
+            <hr>
+
+            <a href="/admin/" class="text-decoration-none"><i
+                    class="fa-solid fa-arrow-left"></i> Back</a>
+
+            <th:block th:if="${session.successMsg}">
+                <p class="text-success fw-bold">[[${session.successMsg}]]</p>
+                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <th:block th:if="${session.errorMsg}">
+                <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <div class="col-md-4 p-3">
+                <form action="/admin/products" method="get">
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" class="form-control " name="ch">
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-primary col">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="p-3">
+                <table class="table table-bordered">
+                    <thead class="table-light ">
+                    <tr>
+                        <th scope="col">Sl No</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p,c:${products}">
+                        <th scope="row">[[${c.count}]]</th>
+                        <td><img th:src="@{'/image/product_img/'+${p.image}}"
+                                 width="70px" height="70px"></td>
+
+                        <td th:text="${p.title}"></td>
+                        <td th:text="${p.category}"></td>
+                        <td th:text="${p.price}"></td>
+                        <td th:text="${p.isActive}"></td>
+
+                        <td>
+                            <a th:href="@{'/admin/product/edit?id='+${p.id}}" class="btn btn-primary btn-sm"><i
+                                    class="fa-solid fa-pen-to-square"></i> Edit</a>
+                            <a th:href="  @{'/admin/product/delete?id='+${p.id}}" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+
+
+        </div>
+    </div>
+</section>
+</body>
+</html>
