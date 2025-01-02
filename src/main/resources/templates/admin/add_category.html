@@ -55,6 +55,7 @@
                 </div>
             </div>
 
+<!--            Category Details Start -->
             <div class="col-md-8">
                 <div class="card card-sh">
                     <div class="card-header text-center fs-4">Category Details</div>
@@ -69,15 +70,18 @@
                                 <th scope="col">Action</th>
                             </tr>
                             </thead>
+
                             <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>Sample Category</td>
-                                <td>Active</td>
-                                <td><img src="sample-image.jpg" width="50" height="50" alt="Category Image"></td>
+                            <tr th:each="cat,c:${categories}">
+                                <th scope="row">[[${c.count}]]</th>
+                                <td>[[${cat.name}]]</td>
+                                <td>[[${cat.isActive}]]</td>
+                                <td><img th:src="@{'/image/category_img/'+${cat.imageName}}" width="50" height="50" alt="Category Image"></td>
                                 <td>
-                                    <a href="#" class="btn btn-primary btn-sm">Edit</a>
-                                    <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                                    <a th:href="@{'/admin/editCategory/'+${cat.id}}" class="btn btn-primary btn-sm"><i
+                                            class="fa-solid fa-pen-to-square  fa-1x"></i>Edit</a>
+                                    <a th:href="@{'/admin/deleteCategory/'+${cat.id}}" class="btn btn-danger btn-sm"><i
+                                            class="fa-solid fa-trash  fa-1x"></i>Delete</a>
                                 </td>
                             </tr>
                             </tbody>
@@ -106,6 +110,10 @@
                     </div>
                 </div>
             </div>
+
+<!--            Category Details End-->
+
+
         </div>
     </div>
 </section>
