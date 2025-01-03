@@ -215,6 +215,38 @@ public class AdminController {
         return "redirect:/admin/products";
     }
 
+
+    @GetMapping("/product/edit/{id}")
+    public String editProduct(@PathVariable("id") Integer id, Model m){
+        Product product = productService.getProductById(id);
+
+        if (product == null) {
+            return "redirect:/admin/products";
+        }
+
+        List<Category> categories = categoryService.getAllCategory();
+        m.addAttribute("categories", categories);
+        m.addAttribute("product", product);
+        return "admin/edit_product";
+    }
+
+    @PostMapping("/updateProduct")
+    public String updateProduct(@ModelAttribute Product product, @RequestParam("file") MultipartFile file, HttpSession session) throws IOException
+    {
+        Product oldProduct = productService.updateProduct(product, file);
+
+        if (oldProduct == null) {
+            session.setAttribute("errorMsg", "Product not found");
+            return "redirect:/admin/products";
+        }
+
+        session.setAttribute("successMsg", "Product updated successfully");
+
+        return "redirect:/admin/products";
+    }
+
+
+
     @GetMapping("/")
     public String index(){
         return "admin/index";

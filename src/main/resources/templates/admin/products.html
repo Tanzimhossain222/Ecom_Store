@@ -67,7 +67,7 @@
                         <td th:text="${p.isActive}"></td>
 
                         <td>
-                            <a th:href="@{'/admin/product/edit?id='+${p.id}}" class="btn btn-primary btn-sm"><i
+                            <a th:href="@{'/admin/product/edit/'+${p.id}}" class="btn btn-primary btn-sm"><i
                                     class="fa-solid fa-pen-to-square"></i> Edit</a>
                             <a th:href="  @{'/admin/product/delete?id='+${p.id}}" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
                         </td>
