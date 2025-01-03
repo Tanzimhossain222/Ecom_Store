@@ -31,6 +31,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> getAllActiveProduct() {
+        List<Product> products = productRepository.findByIsActiveTrue();
+        return products;
+    }
+
+    @Override
     public boolean deleteProduct(Integer id) {
 
         Product product = productRepository.findById(id).orElse(null);
@@ -66,12 +72,14 @@ public class ProductServiceImpl implements ProductService {
             dbProduct.setDescription(product.getDescription());
             dbProduct.setDiscount(product.getDiscount());
 
-            if (product.getDiscount() > 0) {
-                Double discountPrice = product.getPrice() - (product.getPrice() * product.getDiscount() / 100);
-                dbProduct.setDiscountPrice(discountPrice);
-            } else {
-                dbProduct.setDiscountPrice(product.getPrice());
-            }
+
+
+        if (product.getDiscount() > 0) {
+            Double discountPrice = product.getPrice() - (product.getPrice() * product.getDiscount() / 100);
+            dbProduct.setDiscountPrice(Double.valueOf(String.format("%.2f", discountPrice)));
+        } else {
+            dbProduct.setDiscountPrice(Double.valueOf(String.format("%.2f", product.getPrice())));
+        }
 
 
             dbProduct.setImage(imageName);
