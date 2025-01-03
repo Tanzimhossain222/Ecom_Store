@@ -13,11 +13,12 @@
 
     <div class="container-fluid mt-4 p-3">
         <div class="row">
+            <div class="mt-4">
+                <a href="/admin" class="text-decoration-none"><i
+                        class="fa-solid fa-arrow-left"></i> Back</a>
+            </div>
             <p class="text-center fs-3 mt-4">All Products</p>
             <hr>
-
-            <a href="/admin/" class="text-decoration-none"><i
-                    class="fa-solid fa-arrow-left"></i> Back</a>
 
             <th:block th:if="${session.successMsg}">
                 <p class="text-success fw-bold">[[${session.successMsg}]]</p>
@@ -51,6 +52,10 @@
                         <th scope="col">Title</th>
                         <th scope="col">Category</th>
                         <th scope="col">Price</th>
+                        <th scope="col">Discount</th>
+                        <th scope="col">Discount Price</th>
+                        <th scope="col">Stock</th>
+
                         <th scope="col">Status</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -64,6 +69,10 @@
                         <td th:text="${p.title}"></td>
                         <td th:text="${p.category}"></td>
                         <td th:text="${p.price}"></td>
+                        <td th:text="${p.discount}"></td>
+                        <td th:text="${p.discountPrice}"></td>
+                        <td th:text="${p.stock}"></td>
+
                         <td th:text="${p.isActive}"></td>
 
                         <td>
@@ -75,11 +84,6 @@
                     </tbody>
                 </table>
             </div>
-
-
-
-
-
 
         </div>
     </div>

@@ -28,6 +28,8 @@ public class Product {
     private  String image;
     private  Boolean isActive;
     private String category;
+    private Integer discount;
+    private Double discountPrice;
 
     @Override
     public String toString() {

@@ -12,13 +12,14 @@
 <section>
     <div class="container p-5 mt-3">
         <div class="row">
+            <div class="mt-3">
+                <a href="/admin" class="text-decoration-none"><i
+                        class="fa-solid fa-arrow-left"></i> Back</a>
+            </div>
             <div class="col-md-6 offset-md-3">
                 <div class="card card-sh">
                     <div class="card-header text-center">
                         <p class="fs-4">Add Product</p>
-
-                        <a href="/admin/" class="text-decoration-none"><i
-                                class="fa-solid fa-arrow-left"></i> Back</a>
 
                         <th:block th:if="${session.successMsg}">
                             <p class="text-success fw-bold" th:text="${session.successMsg}" style="display: block;"></p>
@@ -33,7 +34,7 @@
 
                     </div>
                     <div class="card-body">
-                        <form action="/admin/saveProduct" method="post" enctype="multipart/form-data">
+                        <form action="/admin/product/save" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="title">Enter Title</label>
                                 <input type="text" id="title" name="title" class="form-control">
