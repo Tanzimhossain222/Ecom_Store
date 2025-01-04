@@ -11,4 +11,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
 
     List<Product> findByIsActiveTrue();
+
+    List<Product> findByIsActiveTrueAndCategory(String category);
 }

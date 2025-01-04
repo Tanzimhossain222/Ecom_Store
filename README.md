@@ -5,4 +5,7 @@ This is a simple e-commerce store. Java Spring Boot and template Engine Thymelea
 
 ## Features
 - Login and Registration
-- 
+- Display products
+- Add Product - Admin
+- CURD operations on products - Admin
+- Category CURD Operations - Admin

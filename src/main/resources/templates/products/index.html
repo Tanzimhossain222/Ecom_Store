@@ -33,9 +33,12 @@
                     <div class="card-body">
                         <h5 class="fw-bold">Categories</h5>
                         <ul class="list-group list-group-flush">
+                            <li class="list-group-item list-group-item-action" th:classappend="${paramValue== ''} ? 'active':''">
+                                <a th:href="@{/products}" class="text-decoration-none text-dark ">All</a>
+                            </li>
 
-                            <li class="list-group-item list-group-item-action" th:each=" c:${categories}">
-                                <a th:href="@{/products(id=${c.id})}" class="text-decoration-none text-dark" th:text="${c.name}"></a>
+                            <li class="list-group-item list-group-item-action" th:classappend="${paramValue== c.name} ? 'active':''" th:each=" c:${categories}">
+                                <a th:href="@{/products(category=${c.name})}" class="text-decoration-none text-dark"  th:text="${c.name}"></a>
                             </li>
 
                         </ul>
@@ -50,6 +53,14 @@
                         <h3 class="text-center mb-4 fw-bold">Products</h3>
                         <div class="row g-4">
 
+                            <th:block th:if="${products.isEmpty()}">
+                                <div class="col-12">
+                                    <div class="alert alert-danger text-center" role="alert">
+                                        No products found!
+                                    </div>
+                                </div>
+                            </th:block>
+
                             <!-- Single Product -->
                             <div class="col-sm-6 col-md-4" th:each="product:${products}">
                                 <div class="card h-100 shadow-sm">
@@ -62,9 +73,8 @@
                                         <h5 class="card-title fw-bold" th:text="${product.title}"></h5>
                                         <p class="card-text text-muted flex-grow-1" th:text="${product.description}"></p>
                                         <p class="card-text fw-bold mb-3">
-                                            <span>$[[${product.discountPrice}]]</span>
-                                            <span class="text-decoration-line-through text-secondary" >$[[${product.price}]]</span> <span class="text-success fs-6 ms-2" >
-                                            [[${product.discount}]]% OFF
+                                            <span>$[[${product.discountPrice}]]</span> <br>
+                                            <span class="text-decoration-line-through text-secondary" >$[[${product.price}]]</span> <span class="text-success fs-6 ms-2" >[[${product.discount}]]% OFF
                                         </span>
                                         </p>
 

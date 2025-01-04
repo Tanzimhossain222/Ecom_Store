@@ -11,7 +11,7 @@ public interface ProductService {
     Product saveProduct(Product product);
 
     List<Product> getAllProduct();
-    List<Product> getAllActiveProduct();
+    List<Product> getAllActiveProduct(String category);
 
     boolean deleteProduct(Integer id);
 
