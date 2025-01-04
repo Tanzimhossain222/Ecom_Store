@@ -37,6 +37,8 @@ public class UserDtls {
 
     private String profileImage;
 
+    private String role;
+
     @Override
     public String toString() {
         return "UserDtls{" +
@@ -50,6 +52,7 @@ public class UserDtls {
                 ", pincode='" + pincode + '\'' +
                 ", password='" + password + '\'' +
                 ", profileImage='" + profileImage + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 }

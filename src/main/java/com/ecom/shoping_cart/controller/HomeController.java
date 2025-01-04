@@ -4,13 +4,16 @@ import com.ecom.shoping_cart.model.Category;
 import com.ecom.shoping_cart.model.Product;
 import com.ecom.shoping_cart.service.CategoryService;
 import com.ecom.shoping_cart.service.ProductService;
+import com.ecom.shoping_cart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -22,11 +25,13 @@ public class HomeController {
     @Autowired
     ProductService productService;
 
+    @Autowired
+    UserService userService;
+
     @GetMapping("/")
     public String index(){
         return "index";
     }
-
 
 
     @GetMapping("/products")

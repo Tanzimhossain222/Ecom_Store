@@ -9,3 +9,4 @@ This is a simple e-commerce store. Java Spring Boot and template Engine Thymelea
 - Add Product - Admin
 - CURD operations on products - Admin
 - Category CURD Operations - Admin
+- Spring Security for Authentication and Authorization
