@@ -1,8 +1,10 @@
 package com.ecom.shoping_cart.config;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
@@ -14,6 +16,11 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 @Configuration
 public class SecurityConfig {
+
+
+    @Autowired
+    @Lazy
+    private AuthFailureHandlerImpl authFailureHandler;
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
@@ -38,19 +45,24 @@ public class SecurityConfig {
         return daoAuthenticationProvider;
     }
 
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable()).cors(cors -> cors.disable())
+        http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
                 .authorizeHttpRequests(req -> req.requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/**").permitAll())
                 .formLogin(form -> form.loginPage("/signin")
                         .loginProcessingUrl("/login")
+                        .failureHandler(authFailureHandler)
                         .successHandler(authenticationSuccessHandler())
-                        .permitAll()
-                ).logout(LogoutConfigurer::permitAll);
+                        .permitAll())
+                .logout(LogoutConfigurer::permitAll);
 
         return http.build();
     }
+
+
 }
