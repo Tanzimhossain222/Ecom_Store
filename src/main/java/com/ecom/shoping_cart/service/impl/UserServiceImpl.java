@@ -8,6 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -21,6 +23,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtls saveUser(UserDtls userDtls) {
         userDtls.setRole("ROLE_USER");
+        userDtls.setIsEnable(true);
         String encodedPassword = passwordEncoder.encode(userDtls.getPassword());
         userDtls.setPassword(encodedPassword);
         return userRepository.save(userDtls);
@@ -35,4 +38,23 @@ public class UserServiceImpl implements UserService {
     public UserDtls getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    @Override
+    public List<UserDtls> getAllUsers(String role) {
+        return userRepository.findAllByRole(role);
+    }
+
+    @Override
+    public Boolean updateAccountStatus(Integer id, Boolean status) {
+        UserDtls user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        user.setIsEnable(status);
+        userRepository.save(user);
+        return true;
+
+    }
+
+
 }

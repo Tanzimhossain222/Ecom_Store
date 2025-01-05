@@ -39,6 +39,10 @@ public class UserDtls {
 
     private String role;
 
+    private Boolean isEnable;
+
+
+
     @Override
     public String toString() {
         return "UserDtls{" +

@@ -3,6 +3,8 @@ package com.ecom.shoping_cart.service;
 import com.ecom.shoping_cart.model.UserDtls;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface UserService {
 
@@ -12,5 +14,7 @@ public interface UserService {
 
     UserDtls getUserByEmail(String email);
 
+    List<UserDtls> getAllUsers(String role);
 
+    Boolean updateAccountStatus(Integer id, Boolean status);
 }
