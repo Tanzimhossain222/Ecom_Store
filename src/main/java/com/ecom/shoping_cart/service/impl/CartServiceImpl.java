@@ -10,6 +10,7 @@ import com.ecom.shoping_cart.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,11 +52,68 @@ public class CartServiceImpl implements CartService {
         cart.setTotalPrice(1 * product.getDiscountPrice());
 
         return cartRepository.save(cart);
-
     }
 
     @Override
     public List<Cart> getCartByUser(Integer userId) {
-        return List.of();
+
+        List<Cart> carts= cartRepository.findByUserId(userId);
+
+        List<Cart> updateCarts = new ArrayList<>();
+
+        Double totalOrderPrice = 0.0;
+
+        for(Cart cart : carts){
+            Double totalPrice = (cart.getQuantity() * cart.getProduct().getDiscountPrice());
+            totalPrice = Double.valueOf(String.format("%.2f", totalPrice));
+            cart.setTotalPrice(totalPrice);
+
+
+            totalOrderPrice += totalPrice;
+            totalOrderPrice = Double.valueOf(String.format("%.2f", totalOrderPrice));
+            cart.setTotalOrderPrice(totalOrderPrice);
+
+            updateCarts.add(cart);
+        }
+
+        return updateCarts;
     }
+
+    @Override
+    public Integer getCartCount(Integer userId) {
+        return  cartRepository.countByUserId(userId);
+    }
+
+    @Override
+    public void updateQuantity(Integer cartId, String type) {
+
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+
+        if (cart == null) {
+            return;
+        }
+
+        switch (type) {
+            case "inc":
+                cart.setQuantity(cart.getQuantity() + 1);
+                break;
+
+            case "dec":
+                if (cart.getQuantity() > 1) {
+                    cart.setQuantity(cart.getQuantity() - 1);
+                } else {
+                    cartRepository.delete(cart);
+                    return;
+                }
+                break;
+
+            default:
+                break;
+        }
+        cart.setTotalPrice(cart.getQuantity() * cart.getProduct().getDiscountPrice());
+
+        cartRepository.save(cart);
+
+    }
+
 }

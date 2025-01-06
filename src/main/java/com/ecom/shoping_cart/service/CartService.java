@@ -9,4 +9,7 @@ import java.util.List;
 public interface CartService {
     Cart saveCart(Integer userId, Integer productId);
     List<Cart> getCartByUser(Integer userId);
+    Integer getCartCount(Integer userId);
+
+    void updateQuantity(Integer cardId, String type);
 }
