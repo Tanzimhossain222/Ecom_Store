@@ -8,8 +8,6 @@
 </head>
 <body>
 
-
-
 <section>
     <div class="container mt-5 mb-5">
         <div class="card shadow-lg border-0">
@@ -18,12 +16,15 @@
 
                     <!-- Success or Error Messages -->
                     <div class="col-12">
-                        <div class="alert alert-success text-center d-none" role="alert">
-                            Product added successfully to the cart!
-                        </div>
-                        <div class="alert alert-danger text-center d-none" role="alert">
-                            Something went wrong. Please try again.
-                        </div>
+                        <th:block th:if="${session.successMsg}">
+                            <p class="text-success fw-bold">[[${session.successMsg}]]</p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+
+                        <th:block th:if="${session.errorMsg}">
+                            <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
                     </div>
 
                     <!-- Product Image -->
@@ -86,7 +87,14 @@
 
 
                             <th:block th:if="${product.stock>0}">
+                                <th:block th:if="${user==null}">
                                 <a href="/signin" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-cart-plus"></i> Add To Cart
+                                </a>
+                                </th:block>
+
+                                <th:block th:if="${user!=null}">
+                                <a th:href="@{'/user/cart/add?productId=' + ${product.id} + '&userId='+ ${user.id} }" class="btn btn-primary btn-lg">
                                     <i class="fas fa-cart-plus"></i> Add To Cart
                                 </a>
                             </th:block>
