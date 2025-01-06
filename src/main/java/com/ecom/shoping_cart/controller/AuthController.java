@@ -2,14 +2,14 @@ package com.ecom.shoping_cart.controller;
 
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.service.UserService;
+import com.ecom.shoping_cart.utils.CommonUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -25,6 +25,9 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CommonUtils commonUtils;
 
     @GetMapping("/signin")
     public String login(){
@@ -69,5 +72,89 @@ public class AuthController {
 
         return  "redirect:/register";
     }
+
+    @GetMapping("/forgot-password")
+    public String showForgotPassword( ) {
+
+        return "auth/forgot_password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam("email") String email, HttpSession session, HttpServletRequest request) {
+        UserDtls userByEmail = userService.getUserByEmail(email);
+
+        if (userByEmail == null) {
+
+            session.setAttribute("errorMsg", "User not found with this email !!");
+        } else {
+
+           try{
+               String token = commonUtils.generateToken();
+               userService.updateResetToken(token, email);
+
+               //generate URL: http://localhost:8080/reset-password?token=123456
+               String url =    commonUtils.generateURL(request);
+               url = url + "/reset-password?token=" + token;
+
+
+               Boolean sendMail=   commonUtils.sendEmail( email, url);
+
+               if (sendMail) {
+
+                   session.setAttribute("successMsg", "Reset link sent to your email !!");
+               } else {
+
+                   session.setAttribute("errorMsg", "Something went wrong !! Mail not sent !!");
+               }
+           } catch (Exception e){
+               e.printStackTrace();
+               session.setAttribute("errorMsg", "Something went wrong !! Mail not sent !!");
+           }
+
+        }
+
+        return "redirect:/forgot-password";
+    }
+
+
+
+    @GetMapping("/reset-password")
+    public String showResetPassword(@RequestParam("token") String token, Model model) {
+
+        UserDtls user = userService.getUserByToken(token);
+
+        if (user == null) {
+            model.addAttribute("msg", "Invalid token !!");
+            return "message";
+        }
+
+        model.addAttribute("token", token);
+        return "auth/reset_password";
+    }
+
+
+    @PostMapping("/reset-password")
+    public String resetPassword(@RequestParam("token") String token, @RequestParam("password") String newPassword, Model model) {
+
+        UserDtls user = userService.getUserByToken(token);
+
+        if (user == null) {
+            model.addAttribute("msg", "Invalid token !!");
+            return "message";
+        }
+
+        Boolean res =  userService.updatePassword(user.getId(), newPassword);
+        System.out.println("Result: " + res);
+
+        if (!res) {
+            model.addAttribute("msg", "Something went wrong !!");
+            return "message";
+        }
+
+        model.addAttribute("msg", "Password updated successfully !!");
+        return "message";
+
+    }
+
 
 }

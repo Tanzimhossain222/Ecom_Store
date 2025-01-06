@@ -1,4 +1,4 @@
-package com.ecom.shoping_cart;
+package com.ecom.shoping_cart.utils;
 
 
 public class AppConstant {

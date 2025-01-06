@@ -1,6 +1,6 @@
 package com.ecom.shoping_cart.config;
 
-import com.ecom.shoping_cart.AppConstant;
+import com.ecom.shoping_cart.utils.AppConstant;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.repository.UserRepository;
 import com.ecom.shoping_cart.service.UserService;

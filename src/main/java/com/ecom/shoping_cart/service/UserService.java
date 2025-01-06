@@ -26,5 +26,9 @@ public interface UserService {
 
     void resetFailedAttempts(Integer userId);
 
+    void updateResetToken(String token, String email);
 
+    UserDtls getUserByToken(String token);
+
+    Boolean updatePassword(Integer id, String newPassword);
 }

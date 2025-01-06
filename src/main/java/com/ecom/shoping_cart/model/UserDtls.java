@@ -49,6 +49,8 @@ public class UserDtls {
 
     private Date lockTime;
 
+    private String resetToken;
+
     @Override
     public String toString() {
         return "UserDtls{" +

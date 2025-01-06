@@ -1,13 +1,13 @@
 package com.ecom.shoping_cart.service.impl;
 
-import com.ecom.shoping_cart.AppConstant;
+import com.ecom.shoping_cart.utils.AppConstant;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.repository.UserRepository;
 import com.ecom.shoping_cart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Date;
 import java.util.List;
@@ -104,6 +104,31 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public void updateResetToken(String token, String email) {
+        UserDtls userByEmail = userRepository.findByEmail(email);
+        if (userByEmail != null) {
+            userByEmail.setResetToken(token);
+            userRepository.save(userByEmail);
+        }
+    }
+
+    @Override
+    public UserDtls getUserByToken(String token) {
+        return userRepository.findByResetToken(token);
+    }
+
+    @Override
+    public Boolean updatePassword(Integer id, String newPassword) {
+        UserDtls user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null);
+        userRepository.save(user);
+        return true;
+    }
 
 
 }
