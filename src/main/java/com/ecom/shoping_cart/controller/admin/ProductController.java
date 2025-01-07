@@ -1,4 +1,4 @@
-package com.ecom.shoping_cart.controller;
+package com.ecom.shoping_cart.controller.admin;
 
 import com.ecom.shoping_cart.model.Category;
 import com.ecom.shoping_cart.model.Product;

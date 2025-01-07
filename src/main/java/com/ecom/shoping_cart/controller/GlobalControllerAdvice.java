@@ -1,5 +1,6 @@
 package com.ecom.shoping_cart.controller;
 
+import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.service.CartService;
 import com.ecom.shoping_cart.service.CategoryService;
 import com.ecom.shoping_cart.service.UserService;
@@ -44,6 +45,5 @@ public class GlobalControllerAdvice {
             model.addAttribute("cartCount", (cartCount == null) ? 0 : cartCount);
         }
     }
-
 
 }
