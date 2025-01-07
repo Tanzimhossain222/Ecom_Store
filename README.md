@@ -11,3 +11,8 @@ This is a simple e-commerce store. Java Spring Boot and template Engine Thymelea
 - Category CURD Operations - Admin
 - Spring Security for Authentication and Authorization
 - User account block and unblock - Admin
+- Add to Cart
+- Place Order
+- View Orders
+- Cancel Order
+-

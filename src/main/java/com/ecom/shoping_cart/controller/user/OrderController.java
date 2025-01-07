@@ -3,16 +3,16 @@ package com.ecom.shoping_cart.controller.user;
 import com.ecom.shoping_cart.dto.OrderRequest;
 import com.ecom.shoping_cart.lib.UserInformation;
 import com.ecom.shoping_cart.model.Cart;
+import com.ecom.shoping_cart.model.ProductOrder;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.service.CartService;
 import com.ecom.shoping_cart.service.ProductOrderService;
+import com.ecom.shoping_cart.utils.OrderStatus;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -86,5 +86,50 @@ public String orderPage(Principal principal, Model model) {
         return "user/success";
     }
 
+    @GetMapping("/list")
+    public String orderList(Principal principal, Model model){
+        UserDtls user = userInformation.getUserDetails(principal);
+        List<ProductOrder> productOrders = productOrderService.getOrderByUser(user.getId());
+
+
+        productOrders.sort((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate()));
+        model.addAttribute("orders", productOrders);
+
+        return "user/my_orders";
+    }
+
+    @GetMapping("/cancel")
+    public String cancelOrder(Principal principal, @RequestParam(value = "orderId") Integer orderId, @RequestParam(value = "st") String status, HttpSession session){
+        UserDtls user = userInformation.getUserDetails(principal);
+
+        OrderStatus orderStatus = null;
+
+        try {
+            Integer statusId = Integer.parseInt(status);
+            for (OrderStatus os : OrderStatus.values()) {
+                if (os.getId().equals(statusId)) {
+                    orderStatus = os;
+                    break;
+                }
+            }
+
+            if (orderStatus == null) {
+                throw new IllegalArgumentException("Invalid Order Status ID: " + statusId);
+            }
+        } catch (NumberFormatException e) {
+            session.setAttribute("errorMsg", "Invalid status value");
+            return "redirect:/user/order/list";
+        }
+
+        Boolean res = productOrderService.cancelOrder(user.getId(), orderId, orderStatus.name());
+
+      if (res){
+            session.setAttribute("successMsg", "Order Cancelled Successfully");
+      } else {
+            session.setAttribute("errorMsg", "Order Cancelled Failed");
+        }
+
+        return "redirect:/user/order/list";
+    }
 
 }

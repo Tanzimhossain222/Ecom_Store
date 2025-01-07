@@ -11,9 +11,10 @@ import com.ecom.shoping_cart.utils.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.Date;
+
 
 @Service
 public class ProductOrderServiceImpl implements ProductOrderService {
@@ -33,7 +34,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             // Order Details
             ProductOrder order = new ProductOrder();
             order.setOrderId(UUID.randomUUID().toString());
-            order.setOrderDate(new Date());
+            order.setOrderDate(LocalDate.now());
             order.setProduct(cart.getProduct());
             order.setPrice(cart.getProduct().getDiscountPrice());
             order.setQuantity(cart.getQuantity());
@@ -53,8 +54,6 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             address.setState(orderRequest.getState());
             address.setPincode(orderRequest.getPincode());
 
-
-
             order.setOrderAddress(address);
 
             System.out.println("Final Order: " + order);
@@ -62,8 +61,21 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             orderRepository.save(order);
 
 //            cartRepository.delete(cart);
-
         }
+    }
+
+    @Override
+    public List<ProductOrder> getOrderByUser(Integer userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Boolean cancelOrder(Integer id, Integer orderId, String status) {
+        ProductOrder order = orderRepository.findById(orderId).orElse(null);
+        assert order != null;
+        order.setStatus(status);
+        orderRepository.save(order);
+        return true;
 
     }
 }

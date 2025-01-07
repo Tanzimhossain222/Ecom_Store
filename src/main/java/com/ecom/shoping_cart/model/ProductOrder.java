@@ -3,6 +3,7 @@ package com.ecom.shoping_cart.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -20,7 +21,7 @@ import java.util.Date;
 
         private String orderId;
 
-        private Date orderDate;
+        private LocalDate orderDate;
 
         @ManyToOne
         private Product product;

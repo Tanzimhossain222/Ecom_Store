@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: Layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<section>
+    <div class="container mt-5 p-5">
+        <div class="row">
+            <h2 class="text-center fs-3 mb-4">My Orders</h2>
+
+            <!-- Success Message -->
+            <th:block th:if="${session.successMsg}">
+                <div class="alert alert-success text-center fw-bold" role="alert">
+                    [[${session.successMsg}]]
+                </div>
+                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <!-- Error Message -->
+            <th:block th:if="${session.errorMsg}">
+                <div class="alert alert-danger text-center fw-bold" role="alert">
+                    [[${session.errorMsg}]]
+                </div>
+                <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                        <tr>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Product Details</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="o : ${orders}">
+                            <th scope="row">[[${o.orderId}]]</th>
+                            <td>[[${o.orderDate}]]</td>
+                            <td>
+                                <strong>[[${o.product.title}]]</strong>
+                            </td>
+                            <td>
+                                <div>
+                                    <p>Quantity: <strong>[[${o.quantity}]]</strong></p>
+                                    <p>Price: <strong>[[${o.price}]]</strong></p>
+                                    <p>Total: <strong>[[${o.quantity * o.price}]]</strong></p>
+                                </div>
+                            </td>
+                            <td>
+                            <span th:classappend="${o.status == 'Cancelled'} ? 'badge bg-danger' : 'badge bg-primary'">
+                                [[${o.status}]]
+                            </span>
+                            </td>
+
+                            <td>
+                                <th:block th:if="${o.status != 'CANCELLED'}">
+                                    <a th:href="@{'/user/order/cancel?orderId='+${o.id}+'&st=6'}"
+                                       class="btn btn-sm btn-danger">Cancel</a>
+                                </th:block>
+                                <th:block th:unless="${o.status != 'CANCELLED'}">
+                                    <button class="btn btn-sm btn-secondary disabled" disabled>Cancelled</button>
+                                </th:block>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>
