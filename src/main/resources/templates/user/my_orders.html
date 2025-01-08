@@ -63,12 +63,21 @@
                             </td>
 
                             <td>
-                                <th:block th:if="${o.status != 'CANCELLED'}">
+                                <th:block th:if="${o.status == 'IN_PROGRESS' or o.status == 'ORDER_RECEIVED'}">
                                     <a th:href="@{'/user/order/cancel?orderId='+${o.id}+'&st=6'}"
                                        class="btn btn-sm btn-danger">Cancel</a>
                                 </th:block>
-                                <th:block th:unless="${o.status != 'CANCELLED'}">
-                                    <button class="btn btn-sm btn-secondary disabled" disabled>Cancelled</button>
+
+                                <th:block th:if="${o.status != 'IN_PROGRESS' and o.status != 'ORDER_RECEIVED'}">
+
+                                    <th:block th:if="${o.status == 'CANCELLED'}">
+                                        <button class="btn btn-sm btn-secondary disabled" disabled>Cancelled</button>
+                                    </th:block>
+
+                                    <th:block th:unless="${o.status == 'CANCELLED'}">
+                                        <button class="btn btn-sm btn-secondary disabled" disabled>No Action</button>
+                                    </th:block>
+
                                 </th:block>
                             </td>
                         </tr>

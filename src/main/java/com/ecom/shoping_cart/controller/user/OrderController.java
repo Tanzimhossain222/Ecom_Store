@@ -6,7 +6,8 @@ import com.ecom.shoping_cart.model.Cart;
 import com.ecom.shoping_cart.model.ProductOrder;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.service.CartService;
-import com.ecom.shoping_cart.service.ProductOrderService;
+import com.ecom.shoping_cart.service.OrderService;
+import com.ecom.shoping_cart.utils.MailUtils;
 import com.ecom.shoping_cart.utils.OrderStatus;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,13 @@ public class OrderController {
    private UserInformation userInformation;
 
     @Autowired
-    private ProductOrderService productOrderService;
+    private OrderService orderService;
 
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    MailUtils mailUtils;
 
 
     private Double[] calculateTaxAndShipping(Double totalOrderPrice) {
@@ -81,7 +85,8 @@ public String orderPage(Principal principal, Model model) {
     @PostMapping("/save")
     public String saveOrder(Principal principal, @ModelAttribute OrderRequest orderRequest){
         UserDtls user = userInformation.getUserDetails(principal);
-        productOrderService.saveOrder(user.getId(), orderRequest);
+        orderService.saveOrder(user.getId(), orderRequest);
+
 
         return "user/success";
     }
@@ -89,7 +94,7 @@ public String orderPage(Principal principal, Model model) {
     @GetMapping("/list")
     public String orderList(Principal principal, Model model){
         UserDtls user = userInformation.getUserDetails(principal);
-        List<ProductOrder> productOrders = productOrderService.getOrderByUser(user.getId());
+        List<ProductOrder> productOrders = orderService.getOrderByUser(user.getId());
 
 
         productOrders.sort((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate()));
@@ -121,9 +126,10 @@ public String orderPage(Principal principal, Model model) {
             return "redirect:/user/order/list";
         }
 
-        Boolean res = productOrderService.cancelOrder(user.getId(), orderId, orderStatus.name());
+        ProductOrder  res = orderService.updateOrderStatus(user.getId(), orderId, orderStatus.name());
 
-      if (res){
+      if (!(res == null)){
+            mailUtils.sendMailForProductOrder(res, orderStatus.getStatus());
             session.setAttribute("successMsg", "Order Cancelled Successfully");
       } else {
             session.setAttribute("errorMsg", "Order Cancelled Failed");

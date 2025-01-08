@@ -3,6 +3,7 @@ package com.ecom.shoping_cart.controller;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.service.UserService;
 import com.ecom.shoping_cart.utils.CommonUtils;
+import com.ecom.shoping_cart.utils.MailUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class AuthController {
 
     @Autowired
     private CommonUtils commonUtils;
+
+    @Autowired
+    private MailUtils mailUtils;
 
     @GetMapping("/signin")
     public String login(){
@@ -96,8 +100,7 @@ public class AuthController {
                String url =    commonUtils.generateURL(request);
                url = url + "/reset-password?token=" + token;
 
-
-               Boolean sendMail=   commonUtils.sendEmail( email, url);
+               Boolean sendMail=   mailUtils.sendEmail( email, url);
 
                if (sendMail) {
 

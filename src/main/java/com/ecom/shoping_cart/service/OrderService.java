@@ -5,9 +5,11 @@ import com.ecom.shoping_cart.model.ProductOrder;
 
 import java.util.List;
 
-public interface ProductOrderService {
+public interface OrderService {
     void saveOrder(Integer userId, OrderRequest orderRequest);
     List<ProductOrder> getOrderByUser(Integer userId);
 
-    Boolean cancelOrder(Integer id, Integer orderId, String status);
+    ProductOrder updateOrderStatus(Integer id, Integer orderId, String status);
+
+    List<ProductOrder> getAllOrders();
 }

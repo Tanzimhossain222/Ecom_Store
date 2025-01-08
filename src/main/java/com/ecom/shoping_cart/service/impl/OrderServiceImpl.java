@@ -6,7 +6,8 @@ import com.ecom.shoping_cart.model.OrderAddress;
 import com.ecom.shoping_cart.model.ProductOrder;
 import com.ecom.shoping_cart.repository.CartRepository;
 import com.ecom.shoping_cart.repository.OrderRepository;
-import com.ecom.shoping_cart.service.ProductOrderService;
+import com.ecom.shoping_cart.service.OrderService;
+import com.ecom.shoping_cart.utils.MailUtils;
 import com.ecom.shoping_cart.utils.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,16 @@ import java.util.UUID;
 
 
 @Service
-public class ProductOrderServiceImpl implements ProductOrderService {
+public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
     private CartRepository cartRepository;
+
+    @Autowired
+    private MailUtils mailUtils;
 
 
     @Override
@@ -60,6 +64,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
             orderRepository.save(order);
 
+            // Send Email
+            mailUtils.sendMailForProductOrder(order, OrderStatus.SUCCESS.getStatus());
+
 //            cartRepository.delete(cart);
         }
     }
@@ -70,12 +77,22 @@ public class ProductOrderServiceImpl implements ProductOrderService {
     }
 
     @Override
-    public Boolean cancelOrder(Integer id, Integer orderId, String status) {
+    public ProductOrder updateOrderStatus(Integer id, Integer orderId, String status) {
         ProductOrder order = orderRepository.findById(orderId).orElse(null);
         assert order != null;
         order.setStatus(status);
-        orderRepository.save(order);
-        return true;
+        ProductOrder save = orderRepository.save(order);
 
+        if (save != null) {
+            return save;
+        } else {
+            return null;
+        }
+
+    }
+
+    @Override
+    public List<ProductOrder> getAllOrders() {
+        return orderRepository.findAll();
     }
 }

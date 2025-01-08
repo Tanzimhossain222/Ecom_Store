@@ -50,9 +50,7 @@ public class AdminController {
         } else {
             session.setAttribute("errorMsg", "Something went wrong");
         }
-
         return "redirect:/admin/users?type="+type;
-
     }
 
 
