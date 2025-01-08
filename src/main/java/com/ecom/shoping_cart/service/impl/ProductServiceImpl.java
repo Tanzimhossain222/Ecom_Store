@@ -111,4 +111,13 @@ public class ProductServiceImpl implements ProductService {
 
         return updatedProduct;
     }
+
+    @Override
+    public List<Product> searchProduct(String keyword) {
+        List<Product> products = productRepository.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(keyword, keyword);
+        if (products.isEmpty()) {
+            return List.of();
+        }
+        return products;
+    }
 }

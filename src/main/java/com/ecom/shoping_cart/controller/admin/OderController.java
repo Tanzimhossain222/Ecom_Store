@@ -32,8 +32,8 @@ public class OderController {
     public String orderList(Model model) {
         List<ProductOrder> allOrders = orderService.getAllOrders();
 
-        allOrders.sort((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate()));
         model.addAttribute("orders", allOrders);
+        model.addAttribute("searchActive", false);
         return "admin/oders";
     }
 
@@ -73,6 +73,23 @@ public class OderController {
         }
 
         return "redirect:/admin/order/list";
+    }
+
+    @GetMapping("/search")
+    public String searchOrder(@RequestParam("productId") String productId, Model model) {
+
+
+        ProductOrder orderById = orderService.getOrderById(productId);
+
+        if (!(orderById == null)) {
+            model.addAttribute("searchActive", true);
+            model.addAttribute("orderDtls", orderById);
+        } else {
+            model.addAttribute("errorMsg", "Order not found");
+        }
+
+        return "admin/oders";
+
     }
 
 

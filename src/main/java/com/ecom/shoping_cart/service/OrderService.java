@@ -10,6 +10,6 @@ public interface OrderService {
     List<ProductOrder> getOrderByUser(Integer userId);
 
     ProductOrder updateOrderStatus(Integer id, Integer orderId, String status);
-
     List<ProductOrder> getAllOrders();
+    ProductOrder getOrderById(String id);
 }

@@ -17,4 +17,6 @@ public interface ProductService {
 
     Product getProductById(Integer id);
     Product updateProduct(Product product, MultipartFile file);
+
+    List<Product> searchProduct(String keyword);
 }

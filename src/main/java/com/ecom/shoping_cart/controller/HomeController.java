@@ -56,4 +56,13 @@ public class HomeController {
         return "products/view_product";
     }
 
+    @GetMapping("/search")
+    public String searchProduct(@RequestParam("ch") String keyword, Model model){
+        List<Product> products = productService.searchProduct(keyword);
+
+        model.addAttribute("products", products);
+
+        return "products/index";
+    }
+
 }
