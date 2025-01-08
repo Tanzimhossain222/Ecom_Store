@@ -2,6 +2,7 @@ package com.ecom.shoping_cart.service;
 
 import com.ecom.shoping_cart.model.UserDtls;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,4 +32,8 @@ public interface UserService {
     UserDtls getUserByToken(String token);
 
     Boolean updatePassword(Integer id, String newPassword);
+
+    UserDtls updateUser(UserDtls userDtls);
+
+    UserDtls updateUserProfile(UserDtls userDtls, MultipartFile img);
 }

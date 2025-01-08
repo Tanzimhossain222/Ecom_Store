@@ -4,11 +4,21 @@ import com.ecom.shoping_cart.utils.AppConstant;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.repository.UserRepository;
 import com.ecom.shoping_cart.service.UserService;
+import com.ecom.shoping_cart.utils.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +31,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    FileUploadUtil fileUploadUtil;
 
     @Override
     public UserDtls saveUser(UserDtls userDtls) {
@@ -129,6 +141,56 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return true;
     }
+
+    @Override
+    public UserDtls updateUser(UserDtls userDtls) {
+        return userRepository.save(userDtls);
+    }
+
+    @Override
+    public UserDtls updateUserProfile(UserDtls user, MultipartFile img) {
+        UserDtls dbUser = userRepository.findById(user.getId()).orElse(null);
+
+        if (dbUser == null) {
+            return null;
+        }
+
+
+        if (!img.isEmpty()) {
+
+            dbUser.setProfileImage(img.getOriginalFilename());
+        }
+
+
+        dbUser.setName(user.getName());
+        dbUser.setMobileNumber(user.getMobileNumber());
+        dbUser.setAddress(user.getAddress());
+        dbUser.setCity(user.getCity());
+        dbUser.setState(user.getState());
+        dbUser.setPincode(user.getPincode());
+        dbUser = userRepository.save(dbUser);
+
+
+
+        try {
+
+            if ( img != null && !img.isEmpty()) {
+                File saveDir = new ClassPathResource("static/image/profile_img").getFile();
+                if (!saveDir.exists()) {
+                    saveDir.mkdirs();
+                }
+                    Path path = Path.of(saveDir.getAbsolutePath(), img.getOriginalFilename());
+                System.out.println("Path: " + path);
+                    Files.copy(img.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
 
 
 }

@@ -79,8 +79,16 @@
                             <i class="fa-solid fa-user"></i> [[${user.name}]]
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
-                            <li><a class="dropdown-item" href="/user/order/list">My Order</a></li>
+
+                            <li>
+                                <a class="dropdown-item" th:href="${user.role == 'ROLE_ADMIN' ? '/admin/profile' : '/user/profile'}">Profile</a>
+                            </li>
+
+
+                            <th:block th:if="${user.role=='ROLE_USER'}">
+                                <li><a class="dropdown-item" href="/user/order/list">My Order</a></li>
+                            </th:block>
+
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="nav-link active" aria-current="page" href="/logout">
                                 <i class="fa-solid fa-right-to-bracket"></i> Logout</a>
