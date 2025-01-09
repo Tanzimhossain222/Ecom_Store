@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: Layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Message</title>
+
+
+</head>
+<body>
+<section>
+
+    <div class="container mt-5 p-5">
+        <div class="row">
+            <div class="col-md-6 p-5 text-center offset-md-3">
+                <h4 class="fs-4 text-center" th:text="${msg}"></h4>
+            </div>
+
+            <div class="col-md-6 p-5 text-center offset-md-3">
+                <a href="/" class="btn bg-primary text-white col-md-12">Back to Home</a>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

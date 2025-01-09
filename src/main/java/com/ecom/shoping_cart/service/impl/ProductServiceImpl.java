@@ -5,7 +5,11 @@ import com.ecom.shoping_cart.repository.ProductRepository;
 import com.ecom.shoping_cart.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -31,8 +35,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllActiveProduct() {
-        List<Product> products = productRepository.findByIsActiveTrue();
+    public List<Product> getAllActiveProduct(String category) {
+        List<Product> products;
+
+        if(category.isEmpty() || category == null){
+            products = productRepository.findByIsActiveTrue();
+        } else {
+            products = productRepository.findByIsActiveTrueAndCategory(category);
+        }
+
         return products;
     }
 
@@ -104,4 +115,50 @@ public class ProductServiceImpl implements ProductService {
 
         return updatedProduct;
     }
+
+    @Override
+    public List<Product> searchProduct(String keyword) {
+        List<Product> products = productRepository.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(keyword, keyword);
+        if (products.isEmpty()) {
+            return List.of();
+        }
+        return products;
+    }
+
+    @Override
+    public Page<Product> getAllActiveProductPaginated(Integer pageNo, Integer pageSize, String category) {
+        Pageable pageable= PageRequest.of(pageNo, pageSize);
+        Page<Product> pageProduct = null;
+
+        if(ObjectUtils.isEmpty(category)){
+            pageProduct = productRepository.findByIsActiveTrue(pageable);
+        }else {
+            pageProduct = productRepository.findByIsActiveTrueAndCategory(pageable ,category);
+        }
+
+
+        return pageProduct;
+
+    }
+
+    @Override
+    public Page<Product> getAllProductPaginated(Integer pageNo, Integer pageSize) {
+        Pageable pageable= PageRequest.of(pageNo, pageSize);
+        return productRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Product> searchProductPaginated(String keyword, Integer pageNo, Integer pageSize) {
+        Pageable pageable= PageRequest.of(pageNo, pageSize);
+
+        Page<Product> res = productRepository.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(pageable, keyword, keyword);
+
+        if (res.isEmpty()) {
+            return Page.empty();
+        }
+
+        return res;
+
+    }
+
 }

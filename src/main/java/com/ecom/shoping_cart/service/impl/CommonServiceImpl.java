@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Service
 public class CommonServiceImpl implements CommonService {
     @Override
@@ -19,5 +22,11 @@ public class CommonServiceImpl implements CommonService {
             session.removeAttribute("successMsg");
             session.removeAttribute("errorMsg");
         }
+    }
+
+    @Override
+    public String getFormattedOrderDate(LocalDateTime orderDate) {
+        System.out.println("orderDate = " + orderDate);
+        return orderDate != null ? orderDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "N/A";
     }
 }
