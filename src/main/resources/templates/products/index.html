@@ -23,8 +23,6 @@
     </div>
 
     <!-- Categories and Products -->
-
-    <!-- Categories and Products -->
     <div class="container-fluid mt-4">
         <div class="row">
             <!-- Categories Sidebar -->
@@ -34,25 +32,22 @@
                         <h5 class="fw-bold">Categories</h5>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item list-group-item-action" th:classappend="${paramValue== ''} ? 'active':''">
-                                <a th:href="@{/products}" class="text-decoration-none text-dark ">All</a>
+                                <a th:href="@{/products}" class="text-decoration-none text-dark">All</a>
                             </li>
-
-                            <li class="list-group-item list-group-item-action" th:classappend="${paramValue== c.name} ? 'active':''" th:each=" c:${categories}">
-                                <a th:href="@{/products(category=${c.name})}" class="text-decoration-none text-dark"  th:text="${c.name}"></a>
+                            <li class="list-group-item list-group-item-action" th:classappend="${paramValue== c.name} ? 'active':''" th:each="c:${categories}">
+                                <a th:href="@{/products(category=${c.name})}" class="text-decoration-none text-dark" th:text="${c.name}"></a>
                             </li>
-
                         </ul>
                     </div>
                 </div>
             </div>
 
             <!-- Products Section -->
-            <div class="col-md-9" >
+            <div class="col-md-9">
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h3 class="text-center mb-4 fw-bold">Products</h3>
                         <div class="row g-4">
-
                             <th:block th:if="${products.isEmpty()}">
                                 <div class="col-12">
                                     <div class="alert alert-danger text-center" role="alert">
@@ -65,35 +60,64 @@
                             <div class="col-sm-6 col-md-4" th:each="product:${products}">
                                 <div class="card h-100 shadow-sm">
                                     <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden;">
-
-                                        <img th:src="${'/image/product_img/'+product.image}" alt="Laptop" class="img-fluid">
-
+                                        <img th:src="${'/image/product_img/'+product.image}" alt="Product Image" class="img-fluid">
                                     </div>
                                     <div class="card-body text-center d-flex flex-column">
                                         <h5 class="card-title fw-bold" th:text="${product.title}"></h5>
                                         <p class="card-text text-muted flex-grow-1" th:text="${product.description}"></p>
                                         <p class="card-text fw-bold mb-3">
                                             <span>$[[${product.discountPrice}]]</span> <br>
-                                            <span class="text-decoration-line-through text-secondary" >$[[${product.price}]]</span> <span class="text-success fs-6 ms-2" >[[${product.discount}]]% OFF
-                                        </span>
+                                            <span class="text-decoration-line-through text-secondary">$[[${product.price}]]</span>
+                                            <span class="text-success fs-6 ms-2">[[${product.discount}]]% OFF</span>
                                         </p>
-
                                         <a th:href="@{/product/{id}(id=${product.id})}" class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-info-circle"></i> View Product Details
                                         </a>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
+
+                <!-- Pagination -->
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">Total Products: [[${totalElements}]]</span>
+                        <th:block th:if="${productsSize > 0}">
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <!-- Previous Button -->
+                                    <li class="page-item" th:classappend="${isFirst} ? 'disabled' : ''">
+                                        <a class="page-link" th:href="@{'/products?pageNo='+${pageNo - 1}}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+
+
+                                    <!-- Page Numbers -->
+                                    <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                                        th:classappend="${pageNo + 1 == i} ? 'active' : ''">
+                                        <a class="page-link" th:href="@{'/products?pageNo='+${i - 1}}">[[${i}]]</a>
+                                    </li>
+
+                                    <!-- Next Button -->
+                                    <li class="page-item" th:classappend="${isLast} ? 'disabled' : ''">
+                                        <a class="page-link" th:href="@{'/products?pageNo='+${pageNo+1}}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </th:block>
+                    </div>
+                </div>
+
+
+                <!-- Pagenation End -->
             </div>
         </div>
     </div>
-
-
-
 </section>
 
 </body>

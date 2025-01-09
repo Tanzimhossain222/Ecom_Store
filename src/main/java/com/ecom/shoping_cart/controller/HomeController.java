@@ -6,6 +6,7 @@ import com.ecom.shoping_cart.service.CategoryService;
 import com.ecom.shoping_cart.service.ProductService;
 import com.ecom.shoping_cart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,15 +36,24 @@ public class HomeController {
 
 
     @GetMapping("/products")
-    public String product(Model model, @RequestParam(value = "category", required = false, defaultValue = "") String category){
+    public String product(Model model, @RequestParam(value = "category", required = false, defaultValue = "") String category,
+                          @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo, @RequestParam(value = "pageSize", required = false, defaultValue = "1") Integer pageSize){
 
         List<Category> categories = categoryService.getAllActiveCategory();
-
-        List<Product> products = productService.getAllActiveProduct(category);
-
         model.addAttribute("categories", categories);
-        model.addAttribute("products", products);
         model.addAttribute("paramValue", category);
+
+
+        Page<Product> page = productService.getAllActiveProductPaginated(pageNo, pageSize, category);
+        List<Product> products = page.getContent();
+        model.addAttribute("products", products);
+        model.addAttribute(("productsSize"), products.size());
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute(("pageNo"), page.getNumber());
+        model.addAttribute(("totalElements"), page.getTotalElements());
+        model.addAttribute("isFirst", page.isFirst());
+        model.addAttribute("isLast", page.isLast());
+
 
         return "products/index";
     }
@@ -64,5 +74,7 @@ public class HomeController {
 
         return "products/index";
     }
+
+
 
 }

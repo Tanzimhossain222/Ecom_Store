@@ -1,6 +1,7 @@
 package com.ecom.shoping_cart.service;
 
 import com.ecom.shoping_cart.model.Product;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,4 +20,5 @@ public interface ProductService {
     Product updateProduct(Product product, MultipartFile file);
 
     List<Product> searchProduct(String keyword);
+    Page<Product> getAllActiveProductPaginated(Integer pageNo, Integer pageSize, String category);
 }

@@ -5,7 +5,11 @@ import com.ecom.shoping_cart.repository.ProductRepository;
 import com.ecom.shoping_cart.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -120,4 +124,21 @@ public class ProductServiceImpl implements ProductService {
         }
         return products;
     }
+
+    @Override
+    public Page<Product> getAllActiveProductPaginated(Integer pageNo, Integer pageSize, String category) {
+        Pageable pageable= PageRequest.of(pageNo, pageSize);
+        Page<Product> pageProduct = null;
+
+        if(ObjectUtils.isEmpty(category)){
+            pageProduct = productRepository.findByIsActiveTrue(pageable);
+        }else {
+            pageProduct = productRepository.findByIsActiveTrueAndCategory(pageable ,category);
+        }
+
+
+        return pageProduct;
+
+    }
+
 }

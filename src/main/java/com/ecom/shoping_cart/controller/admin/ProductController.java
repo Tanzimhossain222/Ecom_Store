@@ -142,5 +142,18 @@ public class ProductController {
         return "redirect:/admin/product/list";
     }
 
+    @GetMapping("/search")
+    public String searchProduct(@RequestParam("ch") String name, Model m){
+        List<Product> products = productService.searchProduct(name);
+
+        if (products == null) {
+            m.addAttribute("errorMsg", "No products found");
+            return "admin/products";
+        }
+
+        m.addAttribute("products", products);
+        return "admin/products";
+    }
+
 
 }
