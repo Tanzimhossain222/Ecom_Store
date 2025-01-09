@@ -1,6 +1,7 @@
 package com.ecom.shoping_cart.service;
 
 import com.ecom.shoping_cart.model.UserDtls;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,4 +38,10 @@ public interface UserService {
     UserDtls updateUser(UserDtls userDtls);
 
     UserDtls updateUserProfile(UserDtls userDtls, MultipartFile img);
+
+    Boolean deleteUser(Integer id);
+
+    Page<UserDtls> getAllUsersPagination(String role, Integer pageNo, Integer pageSize, String sortBy);
+
+    Page<UserDtls> getAllSearchUsersPagination(String role, String keyword, Integer pageNo, Integer pageSize, String sortBy);
 }

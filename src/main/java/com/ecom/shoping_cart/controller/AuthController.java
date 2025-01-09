@@ -22,8 +22,6 @@ import java.nio.file.StandardCopyOption;
 
 @Controller
 public class AuthController {
-
-
     @Autowired
     private UserService userService;
 
@@ -81,6 +79,8 @@ public class AuthController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
 
         session.setAttribute("successMsg", "User registered successfully");
 

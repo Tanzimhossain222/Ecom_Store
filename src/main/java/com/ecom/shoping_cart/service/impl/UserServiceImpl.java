@@ -8,6 +8,10 @@ import com.ecom.shoping_cart.utils.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -154,11 +158,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtls updateUserProfile(UserDtls user, MultipartFile img) {
         UserDtls dbUser = userRepository.findById(user.getId()).orElse(null);
-
         if (dbUser == null) {
             return null;
         }
-
 
         if (!img.isEmpty()) {
 
@@ -173,8 +175,6 @@ public class UserServiceImpl implements UserService {
         dbUser.setState(user.getState());
         dbUser.setPincode(user.getPincode());
         dbUser = userRepository.save(dbUser);
-
-
 
         try {
 
@@ -194,7 +194,40 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
+    public Boolean deleteUser(Integer id) {
+        UserDtls user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        userRepository.delete(user);
+        return true;
+    }
 
+    @Override
+    public Page<UserDtls> getAllUsersPagination(String role, Integer pageNo, Integer pageSize, String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        return userRepository.findAllByRole(role, pageable);
+    }
+
+    @Override
+    public Page<UserDtls> getAllSearchUsersPagination(String role, String keyword, Integer pageNo, Integer pageSize, String sortBy) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+//        Page<UserDtls> res = userRepository.findAllByRoleAndEmailContainingOrNameContainingOrMobileNumberContaining(role, keyword, keyword, keyword, pageable);
+        Page<UserDtls> res = userRepository.findAllByRoleAnd(
+                role,
+                keyword,
+                pageable
+        );
+
+        if (res.isEmpty()) {
+            return null;
+        }
+
+        return res;
+
+    }
 
 
 }

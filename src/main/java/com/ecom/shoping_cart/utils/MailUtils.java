@@ -82,4 +82,21 @@ public class MailUtils {
 
         return true;
     }
+
+    public void sentEmail(String email, String sub, String message) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+
+        try {
+            helper.setFrom("kdptanzim@gmail.com", "Shopping Cart");
+            helper.setTo(email);
+            helper.setSubject(sub);
+            helper.setText(message, true);
+
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

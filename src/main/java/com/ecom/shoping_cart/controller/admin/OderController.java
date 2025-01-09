@@ -15,6 +15,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -36,7 +37,7 @@ public class OderController {
 
         Page<ProductOrder> page = orderService.getAllOrdersPaginated(pageNo, pageSize);
 
-        List<ProductOrder> allOrders = page.getContent();
+        List<ProductOrder> allOrders = page.getContent().stream().sorted(Comparator.comparing(ProductOrder::getOrderDate)).toList();
 
         model.addAttribute("orders", allOrders);
         model.addAttribute("totalPages", page.getTotalPages());
@@ -98,7 +99,6 @@ public class OderController {
         if (orderId != null && orderId.length() > 0) {
 
             ProductOrder order = orderService.getOrderById(orderId.trim());
-            System.out.println("Order: " + order);
 
             if (ObjectUtils.isEmpty(order)) {
                 session.setAttribute("errorMsg", "Incorrect orderId");
@@ -122,12 +122,12 @@ public class OderController {
             model.addAttribute("isFirst", page.isFirst());
             model.addAttribute("isLast", page.isLast());
             model.addAttribute("searchActive", false);
-
         }
 
         return "admin/oders";
 
     }
+
 
 
 

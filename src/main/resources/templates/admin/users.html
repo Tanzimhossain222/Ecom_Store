@@ -10,62 +10,136 @@
 <body>
 <section>
     <div class="container-fluid mt-5 p-5">
-        <div class="row mb-3">
+
+        <div class=" mb-1">
             <a href="/admin/" class="text-decoration-none"><i
                     class="fa-solid fa-arrow-left"></i> Back</a>
         </div>
-        <div class="card card-sh">
-            <div class="card-header text-center">
-                <p class="fs-4" th:if="${userType==1}">Users</p>
-                <p class="fs-4" th:if="${userType==2}">Admin</p>
-                <th:block th:if="${session.successMsg}">
-                    <p class="text-success fw-bold">[[${session.successMsg}]]</p>
-                    <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
-                </th:block>
 
-                <th:block th:if="${session.errorMsg}">
-                    <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
-                    <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
-                </th:block>
-            </div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">Sl No</th>
-                        <th scope="col">Profile</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Mobile No</th>
-                        <th scope="col">Address</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="u,c:${users}">
-                        <th scope="row">[[${c.count}]]</th>
-                        <td><img th:src="@{'/image/profile_img/'+${u.profileImage}}"
-                                 width="70px" height="70px"></td>
-                        <td>[[${u.name}]]</td>
-                        <td>[[${u.email}]]</td>
-                        <td>[[${u.mobileNumber}]]</td>
-                        <td>[[${u.address+','+u.city+','+u.state+','+u.pincode}]]</td>
-                        <td>[[${u.isEnable}]]</td>
+        <div class="col-md-4 p-3">
+            <form action="/admin/user/search" method="get">
+                <div class="row">
+                    <div class="col">
+                        <input type="text" class="form-control " name="keyword"
+                               placeholder="Enter user email or name">
+                    </div>
+                    <input type="hidden" name="type" th:value="${userType}">
+                    <div class="col">
+                        <button class="btn btn-primary col">Search</button>
+                    </div>
+                </div>
+            </form>
 
-                        <td>
-                            <a th:href="@{'/admin/update-status?status=true&id=' + ${u.id} + '&type=' + ${userType}}"
-                               class="btn btn-sm btn-primary">Active</a>
+        </div>
 
-                            <a th:href="@{'/admin/update-status?status=false&id=' + ${u.id} + '&type=' + ${userType}}"
-                               class="btn btn-sm btn-danger">Inactive</a>
-                        </td>
-                    </tr>
 
-                    </tbody>
-                </table>
+        <div>
+            <div class="card card-sh">
+                <div class="card-header text-center">
+                    <p class="fs-4" th:if="${userType==1}">Users</p>
+                    <p class="fs-4" th:if="${userType==2}">Admin</p>
+                    <th:block th:if="${session.successMsg}">
+                        <p class="text-success fw-bold">[[${session.successMsg}]]</p>
+                        <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <th:block th:if="${session.errorMsg}">
+                        <p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+                        <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+                </div>
+
+
+                <div class="card-body">
+                    <th:block th:if="${users != null and users.size() > 0}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Sl No</th>
+                            <th scope="col">Profile</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Mobile No</th>
+                            <th scope="col">Address</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr th:each="u,c:${users}">
+                            <th scope="row">[[${c.count}]]</th>
+                            <td><img th:src="@{'/image/profile_img/'+${u.profileImage}}"
+                                     width="70px" height="70px"></td>
+                            <td>[[${u.name}]]</td>
+                            <td>[[${u.email}]]</td>
+                            <td>[[${u.mobileNumber}]]</td>
+                            <td>[[${u.address+','+u.city+','+u.state+','+u.pincode}]]</td>
+                            <td>[[${u.isEnable}]]</td>
+
+                            <td>
+                                <a th:href="@{'/admin/update-status?status=true&id=' + ${u.id} + '&type=' + ${userType}}"
+                                   class="btn btn-sm btn-primary">Active</a>
+
+                                <a th:href="@{'/admin/update-status?status=false&id=' + ${u.id} + '&type=' + ${userType}}"
+                                   class="btn btn-sm btn-danger">Inactive</a>
+
+                                <th:block th:if="${userType == 1}">
+                                    <button type="button" class="btn btn-sm btn-warning" th:attr="data-id=${u.id}">Delete</button>
+                                </th:block>
+
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                        </th:block>
+
+                    <th:block th:if="${users == null or users.size() <= 0}">
+                        <div class="text-center">
+                            <p class="fs-5">No Users Found</p>
+                        </div>
+                    </th:block>
+
+<!--                    // Pagination-->
+                    <th:block th:if="${users != null and users.size() > 0}">
+                        <div class="row">
+                            <div class="col-md-4">Total Users : [[${totalElements}]]</div>
+                            <div class="col-md-6">
+
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item"
+                                            th:classappend="${isFirst} ? 'disabled':''"><a
+                                                class="page-link"
+                                                th:href="@{'/admin/users?pageNo='+${pageNo -1} + '&type=' + ${userType}}"
+                                                aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+                                        </a></li>
+
+                                        <li th:each="i:${#numbers.sequence(1,totalPages)}"
+                                            class="page-item" th:classappend="${pageNo+1==i}?'active':''"
+                                            ]]><a class="page-link"
+                                                  th:href="@{'/admin/users?pageNo='+${i -1} + '&type=' + ${userType}}">[[${i}]]</a></li>
+
+                                        <li class="page-item"
+                                            th:classappend="${isLast} ? 'disabled':''"><a
+                                                class="page-link"
+                                                th:href="@{'/admin/users?pageNo='+${pageNo+1} + '&type=' + ${userType}}"
+                                                aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+                                        </a></li>
+                                    </ul>
+                                </nav>
+
+                            </div>
+                        </div>
+                    </th:block>
+
+
+                </div>
+
             </div>
         </div>
+
+
     </div>
 
 </section>

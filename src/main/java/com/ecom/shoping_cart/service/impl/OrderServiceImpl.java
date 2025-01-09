@@ -11,10 +11,12 @@ import com.ecom.shoping_cart.utils.MailUtils;
 import com.ecom.shoping_cart.utils.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
             // Order Details
             ProductOrder order = new ProductOrder();
             order.setOrderId(UUID.randomUUID().toString());
-            order.setOrderDate(LocalDate.now());
+            order.setOrderDate(LocalDateTime.now());
             order.setProduct(cart.getProduct());
             order.setPrice(cart.getProduct().getDiscountPrice());
             order.setQuantity(cart.getQuantity());
@@ -60,16 +62,14 @@ public class OrderServiceImpl implements OrderService {
             address.setState(orderRequest.getState());
             address.setPincode(orderRequest.getPincode());
 
+            // Save Order
             order.setOrderAddress(address);
-
-            System.out.println("Final Order: " + order);
-
             orderRepository.save(order);
 
             // Send Email
             mailUtils.sendMailForProductOrder(order, OrderStatus.SUCCESS.getStatus());
 
-//            cartRepository.delete(cart);
+            cartRepository.delete(cart);
         }
     }
 
@@ -113,9 +113,7 @@ public class OrderServiceImpl implements OrderService {
         return all;
     }
 
-    @Override
-    public Page<ProductOrder> searchOrderPaginated(String keyword, Integer pageNo, Integer pageSize) {
-         return null;
-    }
+
+
 
 }

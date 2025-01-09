@@ -5,6 +5,7 @@ import com.ecom.shoping_cart.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,20 +42,34 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String getAllUsers(@RequestParam("type") Integer type,Model model){
+    public String getAllUsers(@RequestParam("type") Integer type,Model model, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                              @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize, @RequestParam(value = "sortBy", defaultValue = "id") String sortBy) {
 
-        List<UserDtls> users;
+        List<UserDtls> users=null;
+        Page<UserDtls> page = null;
 
         if (type == 1) {
-            users = userService.getAllUsers("ROLE_USER");
+            page  = userService.getAllUsersPagination("ROLE_USER", pageNo, pageSize, sortBy);
         } else if (type == 2) {
-            users = userService.getAllUsers("ROLE_ADMIN");
+            page  = userService.getAllUsersPagination("ROLE_ADMIN", pageNo, pageSize, sortBy);
         } else {
             users = List.of();
         }
 
+
+        assert page != null;
+
+        users = page.getContent();
+
         model.addAttribute("userType",type);
         model.addAttribute("users", users);
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("pageNo", page.getNumber());
+        model.addAttribute("pageSize", page.getSize());
+        model.addAttribute("totalElements", page.getTotalElements());
+        model.addAttribute("isFirst", page.isFirst());
+        model.addAttribute("isLast", page.isLast());
+
         return "admin/users";
     }
 
@@ -157,6 +172,63 @@ public class AdminController {
 
         return "redirect:/admin/profile";
     }
+
+    @GetMapping("/delete-user")
+    public String deleteUser(@RequestParam("id") Integer id, @RequestParam(value = "type", defaultValue = "1") Integer type, HttpSession session){
+        Boolean result = userService.deleteUser(id);
+
+        if(result){
+            session.setAttribute("successMsg", "User deleted successfully");
+        } else {
+            session.setAttribute("errorMsg", "Something went wrong");
+        }
+        return "redirect:/admin/users?type="+type;
+    }
+
+    @GetMapping("/user/search")
+    public String searchUser(@RequestParam("keyword") String keyword, @RequestParam("type") Integer type, Model model, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                              @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize, @RequestParam(value = "sortBy", defaultValue = "id") String sortBy) {
+
+
+        List<UserDtls> users=null;
+        Page<UserDtls> page = null;
+
+        if (type == 1) {
+            page = userService.getAllSearchUsersPagination("ROLE_USER", keyword, pageNo, pageSize, sortBy);
+        } else if (type == 2) {
+            page = userService.getAllSearchUsersPagination("ROLE_ADMIN", keyword, pageNo, pageSize, sortBy);
+        } else {
+            users = List.of();
+        }
+
+        if (ObjectUtils.isEmpty(page)) {
+            model.addAttribute("errorMsg", "No user found");
+
+        }else {
+
+            users = page.getContent();
+
+
+            model.addAttribute("totalPages", page.getTotalPages());
+            model.addAttribute("pageNo", page.getNumber());
+            model.addAttribute("pageSize", page.getSize());
+            model.addAttribute("totalElements", page.getTotalElements());
+            model.addAttribute("isFirst", page.isFirst());
+            model.addAttribute("isLast", page.isLast());
+
+        }
+            model.addAttribute("users", users);
+            model.addAttribute("searchActive", true);
+            model.addAttribute("keyword", keyword);
+            model.addAttribute("userType", type);
+
+
+
+
+        return "admin/users";
+
+    }
+
 
 
 }

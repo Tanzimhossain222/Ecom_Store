@@ -87,7 +87,6 @@ public String orderPage(Principal principal, Model model) {
         UserDtls user = userInformation.getUserDetails(principal);
         orderService.saveOrder(user.getId(), orderRequest);
 
-
         return "user/success";
     }
 

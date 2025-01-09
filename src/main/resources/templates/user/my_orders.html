@@ -45,7 +45,7 @@
                         <tbody>
                         <tr th:each="o : ${orders}">
                             <th scope="row">[[${o.orderId}]]</th>
-                            <td>[[${o.orderDate}]]</td>
+                            <td class="order-date" th:text="${o.orderDate}"></td>
                             <td>
                                 <strong>[[${o.product.title}]]</strong>
                             </td>
