@@ -27,7 +27,7 @@ public class CategoryController {
 
     @GetMapping
     public String categories(    Model m, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                 @RequestParam(value = "pageSize", defaultValue = "2") Integer pageSize) {
+                                 @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize) {
         List<Category> categories = null;
         Page<Category> page = categoryService.getAllCategoryPaginated(pageNo, 2);
         categories = page.getContent();

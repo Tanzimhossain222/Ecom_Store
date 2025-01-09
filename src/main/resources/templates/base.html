@@ -28,11 +28,24 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Aligned Links -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active text-dark" aria-current="page" href="/">
-                        <i class="fa-solid fa-house text-primary"></i> Home
-                    </a>
-                </li>
+
+                <th:block th:if="${user== null or user.role=='ROLE_USER'}">
+                    <li class="nav-item">
+                        <a class="nav-link active text-dark" aria-current="page" href="/">
+                            <i class="fa-solid fa-house text-primary"></i> Home
+                        </a>
+                    </li>
+                </th:block>
+
+                <th:block th:if="${user!=null and user.role=='ROLE_ADMIN'}">
+                    <li class="nav-item">
+                        <a class="nav-link active text-dark" aria-current="page" href="/admin">
+                            <i class="fa-solid fa-house text-primary"></i> Home
+                        </a>
+                    </li>
+                </th:block>
+
+
                 <li class="nav-item">
                     <a class="nav-link text-dark" href="/products">Products</a>
                 </li>

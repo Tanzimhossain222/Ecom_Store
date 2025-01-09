@@ -36,7 +36,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtls saveUser(UserDtls userDtls) {
-        userDtls.setRole("ROLE_USER");
         userDtls.setIsEnable(true);
         userDtls.setAccountNonLocked(true);
         userDtls.setFailedAttempt(0);

@@ -47,6 +47,7 @@ public class AuthController {
     public String saveUser(@ModelAttribute UserDtls userDtls, @RequestParam("img") MultipartFile file, Model model){
         String imageName=   file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
         userDtls.setProfileImage(imageName);
+        userDtls.setRole("ROLE_USER");
 
         UserDtls user = userService.saveUser(userDtls);
         if(user == null){

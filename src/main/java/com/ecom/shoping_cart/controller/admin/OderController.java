@@ -32,7 +32,7 @@ public class OderController {
 
     @GetMapping("/list")
     public String orderList(Model model, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                            @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize) {
+                            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
 
         Page<ProductOrder> page = orderService.getAllOrdersPaginated(pageNo, pageSize);
 

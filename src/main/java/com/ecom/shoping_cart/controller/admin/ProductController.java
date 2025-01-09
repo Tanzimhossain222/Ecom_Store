@@ -32,7 +32,7 @@ public class ProductController {
 
     @GetMapping("/list")
     public String loadViewProduct(Model m, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                  @RequestParam(value = "pageSize", defaultValue = "2") Integer pageSize,
+                                  @RequestParam(value = "pageSize", defaultValue = "9") Integer pageSize,
                                   @RequestParam(value = "ch", required = false) String ch) {
 
         Page<Product> page = null;

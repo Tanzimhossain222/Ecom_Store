@@ -1,12 +1,24 @@
 package com.ecom.shoping_cart.controller.admin;
+import com.ecom.shoping_cart.lib.UserInformation;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.List;
 
 
@@ -15,7 +27,13 @@ import java.util.List;
 public class AdminController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
+    @Autowired
+    private UserInformation userInformation;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping({"", "/"})
     public String index(){
@@ -53,6 +71,85 @@ public class AdminController {
         return "redirect:/admin/users?type="+type;
     }
 
+    @GetMapping("/add-admin")
+    public String addAdminPage(){
+        return "admin/add_admin";
+    }
+
+    @PostMapping("/save-admin")
+    public String saveAdmin(@ModelAttribute UserDtls userDtls, @RequestParam("img") MultipartFile file, Model model){
+        String imageName=   file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
+        userDtls.setProfileImage(imageName);
+        userDtls.setRole("ROLE_ADMIN");
+
+        UserDtls user = userService.saveUser(userDtls);
+        if(user == null){
+            model.addAttribute("errorMsg", "Something went wrong");
+            return "admin/add_admin";
+        }
+
+        try {
+            File staticDir = new ClassPathResource("static").getFile();
+            File profileImgDir = new File(staticDir, "image/profile_img");
+
+            if (!profileImgDir.exists()) {
+                profileImgDir.mkdirs();
+            }
+
+            Path path = Paths.get(profileImgDir.getAbsolutePath() + File.separator + file.getOriginalFilename());
+
+            System.out.println("Path: " + path);
+
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:/admin/users?type=2";
+    }
+
+
+    @GetMapping("/profile")
+    public String profilePage(Principal principal, Model model){
+        UserDtls user = userInformation.getUserDetails(principal);
+
+        model.addAttribute("user", user);
+        return "admin/profile";
+    }
+
+    @PostMapping("/update-profile")
+    public String updateProfile(UserDtls userDtls, Principal principal,@RequestParam(value = "img",required = false) MultipartFile image){
+
+        UserDtls user = userInformation.getUserDetails(principal);
+        UserDtls userDtls1 = userService.updateUserProfile(userDtls, image);
+
+        return "redirect:/admin/profile";
+    }
+
+    @PostMapping("/change-password")
+    public String changePassword(Principal principal, @RequestParam String newPassword, @RequestParam String currentPassword, HttpSession session){
+        UserDtls user = userInformation.getUserDetails(principal);
+
+        Boolean match = passwordEncoder.matches(currentPassword, user.getPassword());
+
+        if(match){
+            user.setPassword(passwordEncoder.encode(newPassword));
+            UserDtls userDtls = userService.updateUser(user);
+
+            if (userDtls != null) {
+
+                session.setAttribute("successMsg", "Password changed successfully");
+            } else {
+                session.setAttribute("errorMsg", "Failed to change password");
+            }
+
+        }else{
+            session.setAttribute("errorMsg", "Current password is incorrect");
+            return "admin/profile";
+        }
+
+        return "redirect:/admin/profile";
+    }
 
 
 }

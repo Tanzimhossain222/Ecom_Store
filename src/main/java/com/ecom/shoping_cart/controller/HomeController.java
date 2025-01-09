@@ -30,14 +30,28 @@ public class HomeController {
     UserService userService;
 
     @GetMapping("/")
-    public String index(){
+    public String index(Model model, Principal principal){
+
+        List<Category> categories = categoryService.getAllActiveCategory().stream()
+                .sorted((c1, c2) -> c2.getId().compareTo(c1.getId()))
+                .limit(6).toList();
+
+        List<Product> allActiveProducts = productService.getAllActiveProduct("").stream()
+                .sorted((p1, p2) -> p2.getId().compareTo(p1.getId())).limit(8).toList();
+
+
+        model.addAttribute("categories", categories);
+        model.addAttribute("products", allActiveProducts);
+
+
+
         return "index";
     }
 
 
     @GetMapping("/products")
     public String product(Model model, @RequestParam(value = "category", required = false, defaultValue = "") String category,
-                          @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo, @RequestParam(value = "pageSize", required = false, defaultValue = "1") Integer pageSize){
+                          @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo, @RequestParam(value = "pageSize", required = false, defaultValue = "9") Integer pageSize){
 
         List<Category> categories = categoryService.getAllActiveCategory();
         model.addAttribute("categories", categories);
