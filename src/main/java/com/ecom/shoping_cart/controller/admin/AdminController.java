@@ -82,6 +82,13 @@ public class AdminController {
         userDtls.setProfileImage(imageName);
         userDtls.setRole("ROLE_ADMIN");
 
+        Boolean check = userService.emailExist(userDtls.getEmail());
+
+        if(check){
+            model.addAttribute("errorMsg", "Email already exist");
+            return "admin/add_admin";
+        }
+
         UserDtls user = userService.saveUser(userDtls);
         if(user == null){
             model.addAttribute("errorMsg", "Something went wrong");

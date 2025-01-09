@@ -44,14 +44,24 @@ public class AuthController {
     }
 
     @RequestMapping("/saveUser")
-    public String saveUser(@ModelAttribute UserDtls userDtls, @RequestParam("img") MultipartFile file, Model model){
+    public String saveUser(@ModelAttribute UserDtls userDtls, @RequestParam("img") MultipartFile file, HttpSession session, Model model){
         String imageName=   file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
         userDtls.setProfileImage(imageName);
         userDtls.setRole("ROLE_USER");
 
+        Boolean check = userService.emailExist(userDtls.getEmail());
+
+        if(check){
+            session.setAttribute("errorMsg", "Email already exist");
+            return "auth/register";
+        }
+
         UserDtls user = userService.saveUser(userDtls);
+
+
+
         if(user == null){
-            model.addAttribute("errorMsg", "Something went wrong");
+            session.setAttribute("errorMsg", "Something went wrong");
             return "auth/register";
         }
 
@@ -72,8 +82,7 @@ public class AuthController {
             e.printStackTrace();
         }
 
-        model.addAttribute("successMsg", "User registered successfully");
-
+        session.setAttribute("successMsg", "User registered successfully");
 
         return  "redirect:/register";
     }

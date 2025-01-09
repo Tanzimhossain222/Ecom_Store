@@ -10,6 +10,7 @@ import java.util.List;
 public interface UserService {
 
     UserDtls saveUser(UserDtls userDtls);
+    Boolean emailExist(String email);
 
     UserDtls getUserById(Integer id);
 
