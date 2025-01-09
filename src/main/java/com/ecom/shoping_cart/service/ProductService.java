@@ -21,4 +21,6 @@ public interface ProductService {
 
     List<Product> searchProduct(String keyword);
     Page<Product> getAllActiveProductPaginated(Integer pageNo, Integer pageSize, String category);
+    Page<Product> getAllProductPaginated(Integer pageNo, Integer pageSize);
+    Page<Product> searchProductPaginated(String keyword, Integer pageNo, Integer pageSize);
 }

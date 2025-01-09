@@ -8,8 +8,10 @@ import com.ecom.shoping_cart.utils.MailUtils;
 import com.ecom.shoping_cart.utils.OrderStatus;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -29,10 +31,22 @@ public class OderController {
     private MailUtils mailUtils;
 
     @GetMapping("/list")
-    public String orderList(Model model) {
-        List<ProductOrder> allOrders = orderService.getAllOrders();
+    public String orderList(Model model, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                            @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize) {
+
+        Page<ProductOrder> page = orderService.getAllOrdersPaginated(pageNo, pageSize);
+
+        List<ProductOrder> allOrders = page.getContent();
 
         model.addAttribute("orders", allOrders);
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("pageNo", page.getNumber());
+        model.addAttribute("pageSize", page.getSize());
+        model.addAttribute("totalElements", page.getTotalElements());
+        model.addAttribute("isFirst", page.isFirst());
+        model.addAttribute("isLast", page.isLast());
+
+
         model.addAttribute("searchActive", false);
         return "admin/oders";
     }
@@ -75,17 +89,40 @@ public class OderController {
         return "redirect:/admin/order/list";
     }
 
+
     @GetMapping("/search")
-    public String searchOrder(@RequestParam("productId") String productId, Model model) {
+    public String searchOrder(@RequestParam("orderId") String orderId, Model model, HttpSession session,
+                              @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                              @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
 
+        if (orderId != null && orderId.length() > 0) {
 
-        ProductOrder orderById = orderService.getOrderById(productId);
+            ProductOrder order = orderService.getOrderById(orderId.trim());
+            System.out.println("Order: " + order);
 
-        if (!(orderById == null)) {
+            if (ObjectUtils.isEmpty(order)) {
+                session.setAttribute("errorMsg", "Incorrect orderId");
+                model.addAttribute("orderDtls", null);
+            } else {
+                model.addAttribute("orderDtls", order);
+            }
+
             model.addAttribute("searchActive", true);
-            model.addAttribute("orderDtls", orderById);
-        } else {
-            model.addAttribute("errorMsg", "Order not found");
+        }else {
+
+            Page<ProductOrder> page = orderService.getAllOrdersPaginated(pageNo, pageSize);
+            List<ProductOrder> allOrders = page.getContent();
+            System.out.println("All Orders: " + allOrders);
+
+            model.addAttribute("orders", allOrders);
+            model.addAttribute("totalPages", page.getTotalPages());
+            model.addAttribute("pageNo", page.getNumber());
+            model.addAttribute("pageSize", page.getSize());
+            model.addAttribute("totalElements", page.getTotalElements());
+            model.addAttribute("isFirst", page.isFirst());
+            model.addAttribute("isLast", page.isLast());
+            model.addAttribute("searchActive", false);
+
         }
 
         return "admin/oders";

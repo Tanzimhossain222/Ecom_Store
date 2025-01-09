@@ -10,6 +10,8 @@ import com.ecom.shoping_cart.service.OrderService;
 import com.ecom.shoping_cart.utils.MailUtils;
 import com.ecom.shoping_cart.utils.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -99,6 +101,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ProductOrder getOrderById(String id) {
         return orderRepository.findByOrderId(id);
+    }
+
+    @Override
+    public Page<ProductOrder> getAllOrdersPaginated(Integer pageNo, Integer pageSize) {
+        Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNo);
+        Page<ProductOrder> all = orderRepository.findAll(pageable);
+        if (all == null) {
+            return null;
+        }
+        return all;
+    }
+
+    @Override
+    public Page<ProductOrder> searchOrderPaginated(String keyword, Integer pageNo, Integer pageSize) {
+         return null;
     }
 
 }

@@ -7,6 +7,7 @@ import com.ecom.shoping_cart.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,16 +31,33 @@ public class ProductController {
     private CategoryService categoryService;
 
     @GetMapping("/list")
-    public String loadViewProduct(Model m){
-        List<Product> products = productService.getAllProduct();
+    public String loadViewProduct(Model m, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                  @RequestParam(value = "pageSize", defaultValue = "2") Integer pageSize,
+                                  @RequestParam(value = "ch", required = false) String ch) {
+
+        Page<Product> page = null;
+        List<Product> products= null;
+        if (ch != null && !ch.isEmpty()) {
+            page = productService.searchProductPaginated(ch, pageNo, pageSize);
+        }else {
+            page = productService.getAllProductPaginated(pageNo, pageSize);
+        }
+
+        products = page.getContent();
 
         if (products == null) {
             m.addAttribute("errorMsg", "No products found");
             return "admin/products";
         }
 
-
         m.addAttribute("products", products);
+        m.addAttribute("totalPages", page.getTotalPages());
+        m.addAttribute("pageNo", page.getNumber());
+        m.addAttribute("pageSize", page.getSize());
+        m.addAttribute("totalElements", page.getTotalElements());
+        m.addAttribute("isFirst", page.isFirst());
+        m.addAttribute("isLast", page.isLast());
+
         return "admin/products";
     }
 
@@ -142,18 +160,18 @@ public class ProductController {
         return "redirect:/admin/product/list";
     }
 
-    @GetMapping("/search")
-    public String searchProduct(@RequestParam("ch") String name, Model m){
-        List<Product> products = productService.searchProduct(name);
-
-        if (products == null) {
-            m.addAttribute("errorMsg", "No products found");
-            return "admin/products";
-        }
-
-        m.addAttribute("products", products);
-        return "admin/products";
-    }
+//    @GetMapping("/search")
+//    public String searchProduct(@RequestParam("ch") String name, Model m){
+//        List<Product> products = productService.searchProduct(name);
+//
+//        if (products == null) {
+//            m.addAttribute("errorMsg", "No products found");
+//            return "admin/products";
+//        }
+//
+//        m.addAttribute("products", products);
+//        return "admin/products";
+//    }
 
 
 }

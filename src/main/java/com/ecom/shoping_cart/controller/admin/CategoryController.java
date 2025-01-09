@@ -5,6 +5,7 @@ import com.ecom.shoping_cart.service.CategoryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +26,21 @@ public class CategoryController {
 
 
     @GetMapping
-    public String categories(Model m){
-        List<Category> categories = categoryService.getAllCategory();
+    public String categories(    Model m, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+                                 @RequestParam(value = "pageSize", defaultValue = "2") Integer pageSize) {
+        List<Category> categories = null;
+        Page<Category> page = categoryService.getAllCategoryPaginated(pageNo, 2);
+        categories = page.getContent();
+
         m.addAttribute("categories", categories);
+        m.addAttribute("totalPages", page.getTotalPages());
+        m.addAttribute("pageNo", page.getNumber());
+        m.addAttribute("pageSize", page.getSize());
+        m.addAttribute("totalElements", page.getTotalElements());
+        m.addAttribute("isFirst", page.isFirst());
+        m.addAttribute("isLast", page.isLast());
+
+
         return "admin/add_category";
     }
 

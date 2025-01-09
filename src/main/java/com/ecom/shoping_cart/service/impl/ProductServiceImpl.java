@@ -141,4 +141,24 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
+    @Override
+    public Page<Product> getAllProductPaginated(Integer pageNo, Integer pageSize) {
+        Pageable pageable= PageRequest.of(pageNo, pageSize);
+        return productRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Product> searchProductPaginated(String keyword, Integer pageNo, Integer pageSize) {
+        Pageable pageable= PageRequest.of(pageNo, pageSize);
+
+        Page<Product> res = productRepository.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(pageable, keyword, keyword);
+
+        if (res.isEmpty()) {
+            return Page.empty();
+        }
+
+        return res;
+
+    }
+
 }

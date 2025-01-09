@@ -15,4 +15,12 @@ This is a simple e-commerce store. Java Spring Boot and template Engine Thymelea
 - Place Order
 - View Orders
 - Cancel Order
--
+- View Profile
+- Update Profile
+- Change Password
+- Forgot Password
+- Email Notification
+- Pagination
+- Search
+
+

@@ -5,6 +5,9 @@ import com.ecom.shoping_cart.repository.CategoryRepository;
 import com.ecom.shoping_cart.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -55,6 +58,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getCategoryById(Integer id) {
         return categoryRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Page<Category> getAllCategoryPaginated(Integer pageNo, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return categoryRepository.findAll(pageable);
     }
 
     @Override
