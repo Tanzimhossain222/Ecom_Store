@@ -5,12 +5,14 @@ import com.ecom.shoping_cart.repository.CategoryRepository;
 import com.ecom.shoping_cart.service.CategoryService;
 import com.ecom.shoping_cart.service.FileService;
 import com.ecom.shoping_cart.utils.BucketType;
+import com.ecom.shoping_cart.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private FileService fileService;
+
 
     @Override
     public Category saveCategory(Category category) {
@@ -73,4 +76,5 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> categories = categoryRepository.findByIsActiveTrue();
         return categories;
     }
+
 }

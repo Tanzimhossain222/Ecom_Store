@@ -76,7 +76,7 @@
                     <div class="card shadow-sm bg-body-tertiary rounded h-100">
                         <div class="card-body text-center d-flex flex-column">
                             <div class="image-container mb-3" style="height: 140px; display: flex; align-items: center; justify-content: center;">
-                                <img th:src="@{'/image/product_img/'+${p.image}}" th:alt="${p.title}" class="img-fluid rounded" style="max-height: 100%; max-width: 100%; object-fit: cover;">
+                                <img th:src="${p.image}" th:alt="${p.title}" class="img-fluid rounded" style="max-height: 100%; max-width: 100%; object-fit: cover;">
                             </div>
                             <h5 class="fw-bold mt-auto">[[${p.title}]]</h5>
                             <p class="text-muted small">[[${p.description}]]</p>

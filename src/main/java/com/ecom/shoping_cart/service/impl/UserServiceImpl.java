@@ -1,12 +1,17 @@
 package com.ecom.shoping_cart.service.impl;
 
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.ecom.shoping_cart.service.FileService;
 import com.ecom.shoping_cart.utils.AppConstant;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.repository.UserRepository;
 import com.ecom.shoping_cart.service.UserService;
+import com.ecom.shoping_cart.utils.BucketType;
+import com.ecom.shoping_cart.utils.CommonUtils;
 import com.ecom.shoping_cart.utils.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,17 +41,42 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    FileUploadUtil fileUploadUtil;
+    @Lazy
+    private CommonUtils commonUtils;
+
+    @Autowired
+    FileService fileService;
 
     @Override
     public UserDtls saveUser(UserDtls userDtls) {
+        return null;
+    }
+
+    @Override
+    public UserDtls saveUser(UserDtls userDtls, MultipartFile file) {
         userDtls.setIsEnable(true);
         userDtls.setAccountNonLocked(true);
         userDtls.setFailedAttempt(0);
 
+        String imageUrl = commonUtils.generateImageUrl(file, BucketType.PROFILE);
+        userDtls.setProfileImage(imageUrl);
         String encodedPassword = passwordEncoder.encode(userDtls.getPassword());
         userDtls.setPassword(encodedPassword);
-        return userRepository.save(userDtls);
+
+        try {
+            UserDtls save = userRepository.save(userDtls);
+
+            Boolean res=   fileService.uploadFileS3(file, BucketType.PROFILE);
+            if (!res) {
+                throw new AmazonS3Exception("Error in saving product image");
+            }
+            return save;
+        } catch (AmazonS3Exception e ) {
+            throw new RuntimeException("Amazon S3 error: " + e.getErrorMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error in saving product");
+        }
+
     }
 
     @Override
@@ -158,15 +188,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtls updateUserProfile(UserDtls user, MultipartFile img) {
         UserDtls dbUser = userRepository.findById(user.getId()).orElse(null);
+
         if (dbUser == null) {
             return null;
         }
-
-        if (!img.isEmpty()) {
-
-            dbUser.setProfileImage(img.getOriginalFilename());
-        }
-
 
         dbUser.setName(user.getName());
         dbUser.setMobileNumber(user.getMobileNumber());
@@ -174,34 +199,55 @@ public class UserServiceImpl implements UserService {
         dbUser.setCity(user.getCity());
         dbUser.setState(user.getState());
         dbUser.setPincode(user.getPincode());
+
+
+        if (!img.isEmpty()) {
+            if(dbUser.getProfileImage() != null) {
+                fileService.deleteFileS3(dbUser.getProfileImage(), BucketType.PROFILE);
+            }
+            String imageUrl = commonUtils.generateImageUrl(img, BucketType.PROFILE);
+            dbUser.setProfileImage(imageUrl);
+        } else {
+            dbUser.setProfileImage(dbUser.getProfileImage());
+        }
         dbUser = userRepository.save(dbUser);
 
         try {
-
-            if ( img != null && !img.isEmpty()) {
-                File saveDir = new ClassPathResource("static/image/profile_img").getFile();
-                if (!saveDir.exists()) {
-                    saveDir.mkdirs();
+            if (!img.isEmpty()) {
+                Boolean res=   fileService.uploadFileS3(img, BucketType.PROFILE);
+                if (!res) {
+                    throw new AmazonS3Exception("Error in saving product image");
                 }
-                    Path path = Path.of(saveDir.getAbsolutePath(), img.getOriginalFilename());
-                System.out.println("Path: " + path);
-                    Files.copy(img.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                }
-            } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return null;
+                }
+            } catch (AmazonS3Exception e ) {
+                throw new RuntimeException("Amazon S3 error: " + e.getErrorMessage(), e);
+            } catch (Exception e) {
+                throw new RuntimeException("Error in saving product");
+            }
+
+        return dbUser;
     }
 
     @Override
     public Boolean deleteUser(Integer id) {
-        UserDtls user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return false;
+        try{
+            UserDtls user = userRepository.findById(id).orElse(null);
+            if (user == null) {
+                return false;
+            }
+
+            if (user.getProfileImage() != null) {
+                fileService.deleteFileS3(user.getProfileImage(), BucketType.PROFILE);
+            }
+
+            userRepository.delete(user);
+            return true;
+        } catch (AmazonS3Exception e) {
+            throw new RuntimeException("Amazon S3 error: " + e.getErrorMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error in deleting product");
         }
-        userRepository.delete(user);
-        return true;
     }
 
     @Override

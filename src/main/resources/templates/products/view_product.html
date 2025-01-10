@@ -29,7 +29,7 @@
 
                     <!-- Product Image -->
                     <div class="col-md-6 text-center">
-                        <img th:src="@{'/image/product_img/' + ${product.image}}"
+                        <img th:src="${product.image}"
                              alt="Product Image" class="img-fluid rounded shadow-sm" style="max-height: 350px;">
 
                     </div>
@@ -88,23 +88,25 @@
 
                             <th:block th:if="${product.stock>0}">
                                 <th:block th:if="${user==null}">
-                                <a href="/signin" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-cart-plus"></i> Add To Cart
-                                </a>
+                                    <a href="/signin" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-cart-plus"></i> Add To Cart
+                                    </a>
                                 </th:block>
 
                                 <th:block th:if="${user!=null}">
-                                <a th:href="@{'/user/cart/add?productId=' + ${product.id} + '&userId='+ ${user.id} }" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-cart-plus"></i> Add To Cart
-                                </a>
-                            </th:block>
+                                    <th:block th:if="${user.role == 'ROLE_USER'}">
+                                        <a th:href="@{'/user/cart/add?productId=' + ${product.id} + '&userId='+ ${user.id} }" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-cart-plus"></i> Add To Cart
+                                        </a>
+                                    </th:block>
+                                </th:block>
 
 
-                            <th:block th:unless="${product.stock>0}">
-                                <button class="btn btn-secondary btn-lg" disabled>
-                                    <i class="fas fa-box fa-lg"></i> Out of Stock
-                                </button>
-                            </th:block>
+                                <th:block th:unless="${product.stock>0}">
+                                    <button class="btn btn-secondary btn-lg" disabled>
+                                        <i class="fas fa-box fa-lg"></i> Out of Stock
+                                    </button>
+                                </th:block>
 
 
                         </div>
