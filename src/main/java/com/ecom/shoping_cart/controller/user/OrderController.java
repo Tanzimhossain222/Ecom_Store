@@ -83,11 +83,15 @@ public String orderPage(Principal principal, Model model) {
 }
 
     @PostMapping("/save")
-    public String saveOrder(Principal principal, @ModelAttribute OrderRequest orderRequest){
-        UserDtls user = userInformation.getUserDetails(principal);
-        orderService.saveOrder(user.getId(), orderRequest);
-
-        return "user/success";
+    public String saveOrder(Principal principal, @ModelAttribute OrderRequest orderRequest, Model model){
+        try{
+            UserDtls user = userInformation.getUserDetails(principal);
+            orderService.saveOrder(user.getId(), orderRequest);
+            return "user/success";
+        } catch (Exception e){
+            model.addAttribute("errorMsg", "Failed to place order");
+            return "user/order";
+        }
     }
 
     @GetMapping("/list")

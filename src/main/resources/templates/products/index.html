@@ -60,7 +60,7 @@
                             <div class="col-sm-6 col-md-4" th:each="product:${products}">
                                 <div class="card h-100 shadow-sm">
                                     <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden;">
-                                        <img th:src="${'/image/product_img/'+product.image}" alt="Product Image" class="img-fluid">
+                                        <img th:src="${product.image}" alt="Product Image" class="img-fluid">
                                     </div>
                                     <div class="card-body text-center d-flex flex-column">
                                         <h5 class="card-title fw-bold" th:text="${product.title}"></h5>

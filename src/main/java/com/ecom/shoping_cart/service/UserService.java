@@ -11,6 +11,7 @@ import java.util.List;
 public interface UserService {
 
     UserDtls saveUser(UserDtls userDtls);
+    public UserDtls saveUser(UserDtls userDtls, MultipartFile file);
     Boolean emailExist(String email);
 
     UserDtls getUserById(Integer id);

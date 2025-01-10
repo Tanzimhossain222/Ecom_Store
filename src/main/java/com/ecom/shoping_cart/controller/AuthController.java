@@ -3,6 +3,7 @@ package com.ecom.shoping_cart.controller;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.service.UserService;
 import com.ecom.shoping_cart.utils.CommonUtils;
+import com.ecom.shoping_cart.utils.FileUploadUtil;
 import com.ecom.shoping_cart.utils.MailUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -30,6 +31,9 @@ public class AuthController {
 
     @Autowired
     private MailUtils mailUtils;
+
+    @Autowired
+    FileUploadUtil fileUploadUtil;
 
     @GetMapping("/signin")
     public String login(){
@@ -80,8 +84,6 @@ public class AuthController {
             e.printStackTrace();
         }
 
-
-
         session.setAttribute("successMsg", "User registered successfully");
 
         return  "redirect:/register";
@@ -106,11 +108,10 @@ public class AuthController {
                String token = commonUtils.generateToken();
                userService.updateResetToken(token, email);
 
-               //generate URL: http://localhost:8080/reset-password?token=123456
                String url =    commonUtils.generateURL(request);
                url = url + "/reset-password?token=" + token;
 
-               Boolean sendMail=   mailUtils.sendEmail( email, url);
+               Boolean sendMail=   mailUtils.sendResetEmail( email, url);
 
                if (sendMail) {
 
@@ -157,7 +158,6 @@ public class AuthController {
         }
 
         Boolean res =  userService.updatePassword(user.getId(), newPassword);
-        System.out.println("Result: " + res);
 
         if (!res) {
             model.addAttribute("msg", "Something went wrong !!");

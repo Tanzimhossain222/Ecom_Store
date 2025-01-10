@@ -10,6 +10,7 @@ import java.util.List;
 @Service
 public interface ProductService {
     Product saveProduct(Product product);
+    Product saveProduct(Product product, MultipartFile file);
 
     List<Product> getAllProduct();
     List<Product> getAllActiveProduct(String category);

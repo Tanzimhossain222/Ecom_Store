@@ -5,6 +5,7 @@ import com.ecom.shoping_cart.service.CartService;
 import com.ecom.shoping_cart.service.CategoryService;
 import com.ecom.shoping_cart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,6 +23,26 @@ public class GlobalControllerAdvice {
 
     @Autowired
     CartService cartService;
+
+    @Value("${spring.datasource.url}")
+    public static String key;
+
+    @Value("${spring.datasource.username}")
+    public static String uname;
+
+    @Value("${spring.datasource.password}")
+    public static String password;
+
+
+
+    @ModelAttribute
+    public void getDbDetails(Model model) {
+        System.out.println("Key: " + key);
+        System.out.println("uname: " + uname);
+        System.out.println("Password: " + password);
+    }
+
+
 
     @ModelAttribute
     public void getUserDetails(Principal p, Model model) {

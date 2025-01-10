@@ -13,33 +13,34 @@ public class MailUtils {
     @Autowired
     private JavaMailSender mailSender;
 
-    public Boolean sendEmail(String recipientEmail, String url) {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-
+    public void sentEmail(String email, String sub, String message) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
         try {
             helper.setFrom("kdptanzim@gmail.com", "Shopping Cart");
-            helper.setTo(recipientEmail);
-
-            String subject = "Reset Password";
-            String content = "<p>Dear User,</p>"
-                    + "<p>Please click the link below to reset your password:</p>"
-                    + "<p><a href=\"" + url + "\">Reset Password</a></p>"
-                    + "<br>"
-                    + "<p>Thank you</p>";
-
-            helper.setSubject(subject);
-            helper.setText(content, true);
-
-            mailSender.send(message);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            helper.setTo(email);
+            helper.setSubject(sub);
+            helper.setText(message, true);
+            mailSender.send(mimeMessage);
         }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 
+    public Boolean sendResetEmail(String recipientEmail, String url) {
+        String subject = "Reset Password";
+        String body = "<p>Dear User,</p>"
+                + "<p>Please click the link below to reset your password:</p>"
+                + "<p><a href=\"" + url + "\">Reset Password</a></p>"
+                + "<br>"
+                + "<p>Thank you</p>";
+
+        sentEmail(recipientEmail, subject, body);
+        return true;
+    }
 
     public Boolean sendMailForProductOrder(ProductOrder order, String status) {
         MimeMessage message = mailSender.createMimeMessage();
@@ -83,20 +84,18 @@ public class MailUtils {
         return true;
     }
 
-    public void sentEmail(String email, String sub, String message) {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
 
-        try {
-            helper.setFrom("kdptanzim@gmail.com", "Shopping Cart");
-            helper.setTo(email);
-            helper.setSubject(sub);
-            helper.setText(message, true);
-
-            mailSender.send(mimeMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    public void registerAdminMail(String email, String password) {
+        String subject = "Admin Registration";
+        String body = "<p>Dear User,</p>"
+                + "<p>Your account has been created successfully.</p>"
+                + "<p>Now You can Login as Admin</p>"
+                + "<p>Email: " + email + "</p>"
+                + "<p>Password: " + password + "</p>"
+                + "<br>"
+                + "<p>Thank you</p>";
+        sentEmail(email, subject, body);
     }
+
+
 }

@@ -1,7 +1,11 @@
 package com.ecom.shoping_cart.controller.admin;
 import com.ecom.shoping_cart.lib.UserInformation;
 import com.ecom.shoping_cart.model.UserDtls;
+import com.ecom.shoping_cart.service.FileService;
 import com.ecom.shoping_cart.service.UserService;
+import com.ecom.shoping_cart.utils.BucketType;
+import com.ecom.shoping_cart.utils.CommonUtils;
+import com.ecom.shoping_cart.utils.MailUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -36,6 +40,12 @@ public class AdminController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private CommonUtils commonUtils;
+
+    @Autowired
+    MailUtils mailUtils;
+
     @GetMapping({"", "/"})
     public String index(){
         return "admin/index";
@@ -55,7 +65,6 @@ public class AdminController {
         } else {
             users = List.of();
         }
-
 
         assert page != null;
 
@@ -93,38 +102,29 @@ public class AdminController {
 
     @PostMapping("/save-admin")
     public String saveAdmin(@ModelAttribute UserDtls userDtls, @RequestParam("img") MultipartFile file, Model model){
-        String imageName=   file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
-        userDtls.setProfileImage(imageName);
-        userDtls.setRole("ROLE_ADMIN");
-
+        try {
         Boolean check = userService.emailExist(userDtls.getEmail());
-
         if(check){
             model.addAttribute("errorMsg", "Email already exist");
             return "admin/add_admin";
         }
+        userDtls.setRole("ROLE_ADMIN");
 
-        UserDtls user = userService.saveUser(userDtls);
+        UserDtls user = userService.saveUser(userDtls, file);
+
         if(user == null){
             model.addAttribute("errorMsg", "Something went wrong");
             return "admin/add_admin";
         }
 
-        try {
-            File staticDir = new ClassPathResource("static").getFile();
-            File profileImgDir = new File(staticDir, "image/profile_img");
+        mailUtils.registerAdminMail(user.getEmail(), userDtls.getPassword());
 
-            if (!profileImgDir.exists()) {
-                profileImgDir.mkdirs();
-            }
+        model.addAttribute("successMsg", "Admin added successfully");
 
-            Path path = Paths.get(profileImgDir.getAbsolutePath() + File.separator + file.getOriginalFilename());
 
-            System.out.println("Path: " + path);
-
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
+        }  catch (Exception e){
+            model.addAttribute("errorMsg", "Something went wrong");
+            return "admin/add_admin";
         }
 
         return "redirect:/admin/users?type=2";
@@ -133,19 +133,32 @@ public class AdminController {
 
     @GetMapping("/profile")
     public String profilePage(Principal principal, Model model){
-        UserDtls user = userInformation.getUserDetails(principal);
+        try{
+            UserDtls user = userInformation.getUserDetails(principal);
+            model.addAttribute("user", user);
+            return "admin/profile";
+        } catch (Exception e){
+            model.addAttribute("errorMsg", "Something went wrong");
+            return "admin/profile";
+        }
 
-        model.addAttribute("user", user);
-        return "admin/profile";
     }
 
     @PostMapping("/update-profile")
-    public String updateProfile(UserDtls userDtls, Principal principal,@RequestParam(value = "img",required = false) MultipartFile image){
+    public String updateProfile(UserDtls userDtls,@RequestParam(value = "img",required = false) MultipartFile image, Model model){
+        try{
+            UserDtls userDtls1 = userService.updateUserProfile(userDtls, image);
+            if(userDtls1 == null){
+                model.addAttribute("errorMsg", "Something went wrong");
+                return "admin/profile";
+            }
+            model.addAttribute("successMsg", "Profile updated successfully");
+            return "redirect:/admin/profile";
 
-        UserDtls user = userInformation.getUserDetails(principal);
-        UserDtls userDtls1 = userService.updateUserProfile(userDtls, image);
-
-        return "redirect:/admin/profile";
+        } catch (Exception e){
+            model.addAttribute("errorMsg", "Something went wrong");
+            return "admin/profile";
+        }
     }
 
     @PostMapping("/change-password")
@@ -175,11 +188,15 @@ public class AdminController {
 
     @GetMapping("/delete-user")
     public String deleteUser(@RequestParam("id") Integer id, @RequestParam(value = "type", defaultValue = "1") Integer type, HttpSession session){
-        Boolean result = userService.deleteUser(id);
+        try{
+            Boolean result = userService.deleteUser(id);
 
-        if(result){
-            session.setAttribute("successMsg", "User deleted successfully");
-        } else {
+            if(result){
+                session.setAttribute("successMsg", "User deleted successfully");
+            } else {
+                session.setAttribute("errorMsg", "Something went wrong");
+            }
+        }catch (Exception e){
             session.setAttribute("errorMsg", "Something went wrong");
         }
         return "redirect:/admin/users?type="+type;
@@ -188,8 +205,6 @@ public class AdminController {
     @GetMapping("/user/search")
     public String searchUser(@RequestParam("keyword") String keyword, @RequestParam("type") Integer type, Model model, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize, @RequestParam(value = "sortBy", defaultValue = "id") String sortBy) {
-
-
         List<UserDtls> users=null;
         Page<UserDtls> page = null;
 

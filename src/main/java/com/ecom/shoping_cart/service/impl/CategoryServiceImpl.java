@@ -3,12 +3,16 @@ package com.ecom.shoping_cart.service.impl;
 import com.ecom.shoping_cart.model.Category;
 import com.ecom.shoping_cart.repository.CategoryRepository;
 import com.ecom.shoping_cart.service.CategoryService;
+import com.ecom.shoping_cart.service.FileService;
+import com.ecom.shoping_cart.utils.BucketType;
+import com.ecom.shoping_cart.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +23,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private FileService fileService;
+
 
     @Override
     public Category saveCategory(Category category) {
@@ -34,21 +42,13 @@ public class CategoryServiceImpl implements CategoryService {
     public Boolean deleteCategory(Integer id) {
         Category category = categoryRepository.findById(id).orElse(null);
         if (category != null) {
-            //also remove image from server
             try {
-                // Remove the image file from the server
-                File imageDir = new ClassPathResource("static/image/category_img").getFile();
-                File imageFile = new File(imageDir, category.getImageName());
-
-                if (imageFile.exists() && !category.getImageName().equals("default.jpg")) {
-                    if (!imageFile.delete()) {
-                        System.err.println("Failed to delete image: " + imageFile.getAbsolutePath());
-                    }
+                if (category.getImageName() != null) {
+                    fileService.deleteFileS3(category.getImageName(), BucketType.CATEGORY);
                 }
-
                 categoryRepository.delete(category);
                 return true;
-            }catch (IOException e) {
+            }catch (Exception e) {
                 System.err.println("Error accessing the image directory: " + e.getMessage());
             }
         }
@@ -76,4 +76,5 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> categories = categoryRepository.findByIsActiveTrue();
         return categories;
     }
+
 }
