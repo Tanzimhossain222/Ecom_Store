@@ -58,33 +58,20 @@ public class AuthController {
             return "auth/register";
         }
 
-        UserDtls user = userService.saveUser(userDtls);
+        try{
+            UserDtls user = userService.saveUser(userDtls, file);
 
+            if(user == null){
+                session.setAttribute("errorMsg", "Something went wrong");
+                return "auth/register";
+            }
 
-
-        if(user == null){
+            session.setAttribute("successMsg", "User registered successfully");
+        } catch (Exception e){
+            e.printStackTrace();
             session.setAttribute("errorMsg", "Something went wrong");
             return "auth/register";
         }
-
-        try {
-            File staticDir = new ClassPathResource("static").getFile();
-            File profileImgDir = new File(staticDir, "image/profile_img");
-
-            if (!profileImgDir.exists()) {
-                profileImgDir.mkdirs();
-            }
-
-            Path path = Paths.get(profileImgDir.getAbsolutePath() + File.separator + file.getOriginalFilename());
-
-            System.out.println("Path: " + path);
-
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        session.setAttribute("successMsg", "User registered successfully");
 
         return  "redirect:/register";
     }

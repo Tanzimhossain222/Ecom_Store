@@ -37,7 +37,7 @@ public class HomeController {
                 .limit(6).toList();
 
         List<Product> allActiveProducts = productService.getAllActiveProduct("").stream()
-                .sorted((p1, p2) -> p2.getId().compareTo(p1.getId())).limit(8).toList();
+                .sorted((p1, p2) -> p2.getId().compareTo(p1.getId())).limit(4).toList();
 
 
         model.addAttribute("categories", categories);
@@ -51,7 +51,7 @@ public class HomeController {
 
     @GetMapping("/products")
     public String product(Model model, @RequestParam(value = "category", required = false, defaultValue = "") String category,
-                          @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo, @RequestParam(value = "pageSize", required = false, defaultValue = "9") Integer pageSize){
+                          @RequestParam(value = "pageNo", required = false, defaultValue = "0") Integer pageNo, @RequestParam(value = "pageSize", required = false, defaultValue = "6") Integer pageSize){
 
         List<Category> categories = categoryService.getAllActiveCategory();
         model.addAttribute("categories", categories);

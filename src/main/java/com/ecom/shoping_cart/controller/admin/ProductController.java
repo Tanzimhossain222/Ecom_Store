@@ -37,7 +37,7 @@ public class ProductController {
 
     @GetMapping("/list")
     public String loadViewProduct(Model m, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                  @RequestParam(value = "pageSize", defaultValue = "9") Integer pageSize,
+                                  @RequestParam(value = "pageSize", defaultValue = "6") Integer pageSize,
                                   @RequestParam(value = "ch", required = false) String ch) {
 
         Page<Product> page = null;
@@ -102,6 +102,7 @@ public class ProductController {
             }
         } catch (Exception e){
             session.setAttribute("errorMsg", "An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return "redirect:/admin/product/list";

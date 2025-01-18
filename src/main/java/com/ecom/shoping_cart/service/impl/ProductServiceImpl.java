@@ -2,11 +2,13 @@ package com.ecom.shoping_cart.service.impl;
 
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.ecom.shoping_cart.model.Product;
+import com.ecom.shoping_cart.repository.CartRepository;
 import com.ecom.shoping_cart.repository.ProductRepository;
 import com.ecom.shoping_cart.service.FileService;
 import com.ecom.shoping_cart.service.ProductService;
 import com.ecom.shoping_cart.utils.BucketType;
 import com.ecom.shoping_cart.utils.CommonUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
@@ -28,7 +30,10 @@ public class ProductServiceImpl implements ProductService {
     private CommonUtils commonUtils;
 
     @Autowired
-    FileService fileService;
+    private FileService fileService;
+
+    @Autowired
+    private CartRepository cartRepository;
 
 
     @Override
@@ -66,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getAllActiveProduct(String category) {
         List<Product> products;
 
-        if(category.isEmpty() || category == null){
+        if(category == null || category.isEmpty()){
             products = productRepository.findByIsActiveTrue();
         } else {
             products = productRepository.findByIsActiveTrueAndCategory(category);
@@ -76,6 +81,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public boolean deleteProduct(Integer id) {
         Product product = productRepository.findById(id).orElse(null);
         if (product == null) {
@@ -86,11 +92,16 @@ public class ProductServiceImpl implements ProductService {
             if (product.getImage() != null) {
                 fileService.deleteFileS3(product.getImage(), BucketType.PRODUCT);
             }
+
+            cartRepository.deleteByProduct(product);
+
+
             productRepository.delete(product);
             return true;
         } catch (AmazonS3Exception e) {
             throw new RuntimeException("Amazon S3 error: " + e.getErrorMessage(), e);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Error in deleting product");
         }
 
@@ -171,7 +182,7 @@ public class ProductServiceImpl implements ProductService {
         Pageable pageable= PageRequest.of(pageNo, pageSize);
         Page<Product> pageProduct = null;
 
-        if(ObjectUtils.isEmpty(category)){
+        if(category == null || category.isEmpty()){
             pageProduct = productRepository.findByIsActiveTrue(pageable);
         }else {
             pageProduct = productRepository.findByIsActiveTrueAndCategory(pageable ,category);
