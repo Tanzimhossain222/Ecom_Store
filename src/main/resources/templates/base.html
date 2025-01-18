@@ -77,11 +77,18 @@
 
                     <th:block th:if="${user.role=='ROLE_USER'}">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/user/cart">
-                                <i class="fa-solid fa-cart-shopping"></i> Cart [ [[${cartCount}]] ]
+                            <a class="nav-link d-flex align-items-center text-dark fw-bold position-relative" href="/user/cart">
+                                <i class="fa-solid fa-cart-shopping me-1" style="font-size: 1.5rem;"></i>
+                                <span class="ms-1">Cart</span>
+                                <span class="badge bg-primary text-white position-absolute translate-middle"
+                                      style="top: 0.4rem; right: -1.3rem; font-size: 0.8rem; padding: 0.3em 0.5em;"
+                                      th:text="${cartCount}">
+            </span>
                             </a>
                         </li>
                     </th:block>
+
+
 
 
                     <li class="nav-item dropdown me-2">

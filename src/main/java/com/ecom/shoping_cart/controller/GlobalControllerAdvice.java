@@ -35,12 +35,12 @@ public class GlobalControllerAdvice {
 
 
 
-    @ModelAttribute
-    public void getDbDetails(Model model) {
-        System.out.println("Key: " + key);
-        System.out.println("uname: " + uname);
-        System.out.println("Password: " + password);
-    }
+//    @ModelAttribute
+//    public void getDbDetails(Model model) {
+//        System.out.println("Key: " + key);
+//        System.out.println("uname: " + uname);
+//        System.out.println("Password: " + password);
+//    }
 
 
 

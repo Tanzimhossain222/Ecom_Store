@@ -37,7 +37,7 @@ public class OderController {
 
         Page<ProductOrder> page = orderService.getAllOrdersPaginated(pageNo, pageSize);
 
-        List<ProductOrder> allOrders = page.getContent().stream().sorted(Comparator.comparing(ProductOrder::getOrderDate)).toList();
+        List<ProductOrder> allOrders = page.getContent().stream().sorted(Comparator.comparing(ProductOrder::getOrderDate).reversed()).toList();
 
         model.addAttribute("orders", allOrders);
         model.addAttribute("totalPages", page.getTotalPages());

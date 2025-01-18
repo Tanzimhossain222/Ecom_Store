@@ -11,6 +11,7 @@ import com.ecom.shoping_cart.repository.ProductRepository;
 import com.ecom.shoping_cart.service.OrderService;
 import com.ecom.shoping_cart.utils.MailUtils;
 import com.ecom.shoping_cart.utils.OrderStatus;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +25,7 @@ import java.util.UUID;
 
 
 @Service
+@Transactional
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -41,55 +43,59 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void saveOrder(Integer userId, OrderRequest orderRequest) {
-        List<Cart> cartList = cartRepository.findByUserId(userId);
+      try {
+          List<Cart> cartList = cartRepository.findByUserId(userId);
 
-        for (Cart cart : cartList ) {
+          for (Cart cart : cartList ) {
 
-            Product product = cart.getProduct();
+              Product product = cart.getProduct();
 
-            if (product.getStock() < cart.getQuantity()) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getTitle());
-            }
+              if (product.getStock() < cart.getQuantity()) {
+                  throw new RuntimeException("Insufficient stock for product: " + product.getTitle());
+              }
 
-
-            // Order Details
-            ProductOrder order = new ProductOrder();
-            order.setOrderId(UUID.randomUUID().toString());
-            order.setOrderDate(LocalDateTime.now());
-            order.setProduct(cart.getProduct());
-            order.setPrice(cart.getProduct().getDiscountPrice());
-            order.setQuantity(cart.getQuantity());
-            order.setUser(cart.getUser());
-            order.setStatus(OrderStatus.IN_PROGRESS.name());
-            order.setPaymentType(orderRequest.getPaymentType());
-
-            // Order Address
-            OrderAddress address = new OrderAddress();
-
-            address.setFirstName(orderRequest.getFirstName());
-            address.setLastName(orderRequest.getLastName());
-            address.setEmail(orderRequest.getEmail());
-            address.setMobileNo(orderRequest.getMobileNo());
-            address.setAddress(orderRequest.getAddress());
-            address.setCity(orderRequest.getCity());
-            address.setState(orderRequest.getState());
-            address.setPincode(orderRequest.getPincode());
-
-            order.setOrderAddress(address);
-
-            // Update Stock
-            product.setStock(product.getStock() - cart.getQuantity());
-            productRepository.save(product);
+              // Update Stock
+              product.setStock(product.getStock() - cart.getQuantity());
+              product = productRepository.save(product);
 
 
-            // Save Order
-            orderRepository.save(order);
+              // Order Details
+              ProductOrder order = new ProductOrder();
+              order.setOrderId(UUID.randomUUID().toString());
+              order.setOrderDate(LocalDateTime.now());
+              order.setProduct(product);
+              order.setPrice(cart.getProduct().getDiscountPrice());
+              order.setQuantity(cart.getQuantity());
+              order.setUser(cart.getUser());
+              order.setStatus(OrderStatus.IN_PROGRESS.name());
+              order.setPaymentType(orderRequest.getPaymentType());
 
-            // Send Email
-            mailUtils.sendMailForProductOrder(order, OrderStatus.SUCCESS.getStatus());
+              // Order Address
+              OrderAddress address = new OrderAddress();
 
-            cartRepository.delete(cart);
-        }
+              address.setFirstName(orderRequest.getFirstName());
+              address.setLastName(orderRequest.getLastName());
+              address.setEmail(orderRequest.getEmail());
+              address.setMobileNo(orderRequest.getMobileNo());
+              address.setAddress(orderRequest.getAddress());
+              address.setCity(orderRequest.getCity());
+              address.setState(orderRequest.getState());
+              address.setPincode(orderRequest.getPincode());
+
+              order.setOrderAddress(address);
+
+              // Save Order
+              orderRepository.save(order);
+              System.out.println("Order Saved: " + order.getOrderId());
+
+              // Send Email
+              mailUtils.sendMailForProductOrder(order, OrderStatus.SUCCESS.getStatus());
+
+              cartRepository.delete(cart);
+          }
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
     }
 
     @Override

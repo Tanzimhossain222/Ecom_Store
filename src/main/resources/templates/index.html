@@ -79,7 +79,8 @@
                                 <img th:src="${p.image}" th:alt="${p.title}" class="img-fluid rounded" style="max-height: 100%; max-width: 100%; object-fit: cover;">
                             </div>
                             <h5 class="fw-bold mt-auto">[[${p.title}]]</h5>
-                            <p class="text-muted small">[[${p.description}]]</p>
+
+                            <p class="card-text text-muted flex-grow-1" th:text="${#strings.substring(p.description, 0, 100)} + '...'"></p>
                             <a th:href="@{'/product/'+${p.id}}" class="btn btn-primary btn-sm mt-auto">View Details</a>
                         </div>
                     </div>

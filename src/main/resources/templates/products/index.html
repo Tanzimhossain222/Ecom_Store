@@ -64,7 +64,8 @@
                                     </div>
                                     <div class="card-body text-center d-flex flex-column">
                                         <h5 class="card-title fw-bold" th:text="${product.title}"></h5>
-                                        <p class="card-text text-muted flex-grow-1" th:text="${product.description}"></p>
+<!--                                        <p class="card-text text-muted flex-grow-1" th:text="${product.description}"></p>-->
+                                        <p class="card-text text-muted flex-grow-1" th:text="${#strings.substring(product.description, 0, 100)} + '...'"></p>
                                         <p class="card-text fw-bold mb-3">
                                             <span>$[[${product.discountPrice}]]</span> <br>
                                             <span class="text-decoration-line-through text-secondary">$[[${product.price}]]</span>
