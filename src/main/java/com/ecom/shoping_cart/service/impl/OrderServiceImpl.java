@@ -3,9 +3,11 @@ package com.ecom.shoping_cart.service.impl;
 import com.ecom.shoping_cart.dto.OrderRequest;
 import com.ecom.shoping_cart.model.Cart;
 import com.ecom.shoping_cart.model.OrderAddress;
+import com.ecom.shoping_cart.model.Product;
 import com.ecom.shoping_cart.model.ProductOrder;
 import com.ecom.shoping_cart.repository.CartRepository;
 import com.ecom.shoping_cart.repository.OrderRepository;
+import com.ecom.shoping_cart.repository.ProductRepository;
 import com.ecom.shoping_cart.service.OrderService;
 import com.ecom.shoping_cart.utils.MailUtils;
 import com.ecom.shoping_cart.utils.OrderStatus;
@@ -33,12 +35,23 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private MailUtils mailUtils;
 
+    @Autowired
+    private ProductRepository productRepository;
+
 
     @Override
     public void saveOrder(Integer userId, OrderRequest orderRequest) {
         List<Cart> cartList = cartRepository.findByUserId(userId);
 
         for (Cart cart : cartList ) {
+
+            Product product = cart.getProduct();
+
+            if (product.getStock() < cart.getQuantity()) {
+                throw new RuntimeException("Insufficient stock for product: " + product.getTitle());
+            }
+
+
             // Order Details
             ProductOrder order = new ProductOrder();
             order.setOrderId(UUID.randomUUID().toString());
@@ -62,8 +75,14 @@ public class OrderServiceImpl implements OrderService {
             address.setState(orderRequest.getState());
             address.setPincode(orderRequest.getPincode());
 
-            // Save Order
             order.setOrderAddress(address);
+
+            // Update Stock
+            product.setStock(product.getStock() - cart.getQuantity());
+            productRepository.save(product);
+
+
+            // Save Order
             orderRepository.save(order);
 
             // Send Email

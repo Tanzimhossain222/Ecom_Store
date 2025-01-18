@@ -1,8 +1,12 @@
 package com.ecom.shoping_cart.service.impl;
 
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.ecom.shoping_cart.model.Product;
 import com.ecom.shoping_cart.repository.ProductRepository;
+import com.ecom.shoping_cart.service.FileService;
 import com.ecom.shoping_cart.service.ProductService;
+import com.ecom.shoping_cart.utils.BucketType;
+import com.ecom.shoping_cart.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
@@ -12,10 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
@@ -24,9 +24,37 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CommonUtils commonUtils;
+
+    @Autowired
+    FileService fileService;
+
+
     @Override
     public Product saveProduct(Product product) {
         return productRepository.save(product);
+    }
+
+    @Override
+    public Product saveProduct(Product product, MultipartFile file) {
+        String ImageUrl = commonUtils.generateImageUrl(file, BucketType.PRODUCT);
+        product.setImage(ImageUrl);
+        product.setDiscount(0);
+        product.setDiscountPrice(product.getPrice());
+           try {
+               Product savedProduct = productRepository.save(product);
+
+               Boolean res=   fileService.uploadFileS3(file, BucketType.PRODUCT);
+                if (!res) {
+                     throw new AmazonS3Exception("Error in saving product image");
+                }
+                return savedProduct;
+           } catch (AmazonS3Exception e ) {
+               throw new RuntimeException("Amazon S3 error: " + e.getErrorMessage(), e);
+           } catch (Exception e) {
+               throw new RuntimeException("Error in saving product");
+           }
     }
 
     @Override
@@ -49,14 +77,22 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public boolean deleteProduct(Integer id) {
-
         Product product = productRepository.findById(id).orElse(null);
-        System.out.println(product);
         if (product == null) {
             return false;
         }
-        productRepository.delete(product);
-        return true;
+
+        try{
+            if (product.getImage() != null) {
+                fileService.deleteFileS3(product.getImage(), BucketType.PRODUCT);
+            }
+            productRepository.delete(product);
+            return true;
+        } catch (AmazonS3Exception e) {
+            throw new RuntimeException("Amazon S3 error: " + e.getErrorMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error in deleting product");
+        }
 
     }
 
@@ -68,52 +104,57 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product updateProduct(Product product, MultipartFile file)  {
 
-            Product dbProduct = productRepository.findById(product.getId()).orElse(null);
+            try{
+                Product dbProduct = productRepository.findById(product.getId()).orElse(null);
 
-            if (dbProduct == null) {
-                return null;
+                if (dbProduct == null) {
+                    return null;
+                }
+
+                dbProduct.setTitle(product.getTitle());
+                dbProduct.setPrice(product.getPrice());
+                dbProduct.setCategory(product.getCategory());
+                dbProduct.setIsActive(product.getIsActive());
+                dbProduct.setStock(product.getStock());
+                dbProduct.setDescription(product.getDescription());
+                dbProduct.setDiscount(product.getDiscount());
+
+                if (product.getDiscount() > 0) {
+                    Double discountPrice = product.getPrice() - (product.getPrice() * product.getDiscount() / 100);
+                    dbProduct.setDiscountPrice(Double.valueOf(String.format("%.2f", discountPrice)));
+                } else {
+                    dbProduct.setDiscountPrice(Double.valueOf(String.format("%.2f", product.getPrice())));
+                }
+
+                if (!file.isEmpty()) {
+                    if (dbProduct.getImage() != null) {
+                        fileService.deleteFileS3(dbProduct.getImage(), BucketType.PRODUCT);
+                    }
+
+                    String imageUrl = commonUtils.generateImageUrl(file, BucketType.PRODUCT);
+                    dbProduct.setImage(imageUrl);
+                } else {
+                    dbProduct.setImage(dbProduct.getImage());
+                }
+                Product updatedProduct = productRepository.save(dbProduct);
+
+                if(ObjectUtils.isEmpty(updatedProduct)){
+                    throw new RuntimeException("Error in updating product");
+                }
+
+                if (!file.isEmpty()){
+                    Boolean res = fileService.uploadFileS3(file, BucketType.PRODUCT);
+                    if (!res) {
+                        throw new AmazonS3Exception("Error in saving product image");
+                    }
+                }
+
+                return updatedProduct;
+            } catch (AmazonS3Exception e) {
+                throw new RuntimeException("Amazon S3 error: " + e.getErrorMessage(), e);
+            } catch (Exception e) {
+                throw new RuntimeException("Error in updating product");
             }
-
-            String imageName = file.isEmpty() ? dbProduct.getImage() : file.getOriginalFilename();
-            dbProduct.setTitle(product.getTitle());
-            dbProduct.setPrice(product.getPrice());
-            dbProduct.setCategory(product.getCategory());
-            dbProduct.setIsActive(product.getIsActive());
-            dbProduct.setStock(product.getStock());
-            dbProduct.setDescription(product.getDescription());
-            dbProduct.setDiscount(product.getDiscount());
-
-
-
-        if (product.getDiscount() > 0) {
-            Double discountPrice = product.getPrice() - (product.getPrice() * product.getDiscount() / 100);
-            dbProduct.setDiscountPrice(Double.valueOf(String.format("%.2f", discountPrice)));
-        } else {
-            dbProduct.setDiscountPrice(Double.valueOf(String.format("%.2f", product.getPrice())));
-        }
-
-
-            dbProduct.setImage(imageName);
-
-            Product updatedProduct = productRepository.save(dbProduct);
-
-           try {
-               if (updatedProduct != null) {
-                   if (!file.isEmpty()) {
-                       File saveDir = new ClassPathResource("static/image/product_img").getFile();
-                       if (!saveDir.exists()) {
-                           saveDir.mkdirs();
-                       }
-
-                       Path path = Path.of(saveDir.getAbsolutePath(), imageName);
-                       Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                   }
-               }
-           } catch (Exception e) {
-               e.printStackTrace();
-           }
-
-        return updatedProduct;
     }
 
     @Override

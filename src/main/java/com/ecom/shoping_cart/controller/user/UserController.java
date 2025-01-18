@@ -4,6 +4,7 @@ import com.ecom.shoping_cart.lib.UserInformation;
 import com.ecom.shoping_cart.model.UserDtls;
 import com.ecom.shoping_cart.service.ProductService;
 import com.ecom.shoping_cart.service.UserService;
+import com.ecom.shoping_cart.utils.FileUploadUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,9 @@ public class UserController {
     private UserInformation userInformation;
 
     @Autowired
+    FileUploadUtil fileUploadUtil;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @GetMapping("/")
@@ -47,12 +51,13 @@ public class UserController {
     }
 
     @PostMapping("/update-profile")
-    public String updateProfile(UserDtls userDtls, Principal principal,@RequestParam(value = "img",required = false) MultipartFile image){
-
-        UserDtls user = userInformation.getUserDetails(principal);
-
-      UserDtls userDtls1 = userService.updateUserProfile(userDtls, image);
-
+    public String updateProfile(UserDtls userDtls,@RequestParam(value = "img",required = false) MultipartFile image, Model model){
+      try {
+          UserDtls userDtls1 = userService.updateUserProfile(userDtls, image);
+      } catch (Exception e) {
+          e.printStackTrace();
+          model.addAttribute("errorMsg", "Failed to update profile");
+      }
         return "redirect:/user/profile";
     }
 
@@ -60,7 +65,7 @@ public class UserController {
     public String changePassword(Principal principal, @RequestParam String newPassword, @RequestParam String currentPassword, HttpSession session){
         UserDtls user = userInformation.getUserDetails(principal);
 
-        Boolean match = passwordEncoder.matches(currentPassword, user.getPassword());
+        boolean match = passwordEncoder.matches(currentPassword, user.getPassword());
 
         if(match){
             user.setPassword(passwordEncoder.encode(newPassword));
@@ -77,7 +82,6 @@ public class UserController {
             session.setAttribute("errorMsg", "Current password is incorrect");
             return "user/profile";
         }
-
 
         return "redirect:/user/profile";
     }

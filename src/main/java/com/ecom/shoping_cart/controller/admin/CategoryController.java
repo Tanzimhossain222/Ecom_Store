@@ -2,12 +2,16 @@ package com.ecom.shoping_cart.controller.admin;
 
 import com.ecom.shoping_cart.model.Category;
 import com.ecom.shoping_cart.service.CategoryService;
+import com.ecom.shoping_cart.service.FileService;
+import com.ecom.shoping_cart.utils.BucketType;
+import com.ecom.shoping_cart.utils.CommonUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,12 +28,18 @@ public class CategoryController {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    private   FileService fileService;
+
+    @Autowired
+    CommonUtils commonUtils;
+
 
     @GetMapping
     public String categories(    Model m, @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                 @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize) {
+                                 @RequestParam(value = "pageSize", defaultValue = "6") Integer pageSize) {
         List<Category> categories = null;
-        Page<Category> page = categoryService.getAllCategoryPaginated(pageNo, 2);
+        Page<Category> page = categoryService.getAllCategoryPaginated(pageNo, pageSize);
         categories = page.getContent();
 
         m.addAttribute("categories", categories);
@@ -48,8 +58,9 @@ public class CategoryController {
     public String saveCategory(@ModelAttribute Category category,
                                @RequestParam("file") MultipartFile file,
                                HttpSession session) {
-        String fileName = file != null && !file.isEmpty() ? file.getOriginalFilename() : "default.jpg";
-        category.setImageName(fileName);
+
+        String imageUrl = commonUtils.generateImageUrl(file, BucketType.CATEGORY);
+        category.setImageName(imageUrl);
 
         try {
 
@@ -59,27 +70,16 @@ public class CategoryController {
             }
 
             Category savedCategory = categoryService.saveCategory(category);
-            if (savedCategory != null) {
-                // Save the file to the server
-                if (file != null && !file.isEmpty()) {
-                    try {
-                        File saveDir = new ClassPathResource("static/image/category_img").getFile();
-                        if (!saveDir.exists()) {
-                            saveDir.mkdirs();
-                        }
 
-                        Path path = Path.of(saveDir.getAbsolutePath(), fileName);
-                        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException e) {
-                        session.setAttribute("errorMsg", "Category saved, but file upload failed: " + e.getMessage());
-                        return "redirect:/admin/category";
-                    }
-                }
-
-                session.setAttribute("successMsg", "Category added successfully");
-            } else {
+            if(ObjectUtils.isEmpty(savedCategory)){
                 session.setAttribute("errorMsg", "Failed to save category");
+            }else{
+                if (!file.isEmpty()) {
+                    fileService.uploadFileS3(file, BucketType.CATEGORY);
+                }
+                session.setAttribute("successMsg", "Category added successfully");
             }
+
         } catch (Exception e) {
             session.setAttribute("errorMsg", "An unexpected error occurred: " + e.getMessage());
         }
@@ -124,27 +124,28 @@ public class CategoryController {
             return "redirect:/admin/category";
         }
 
-        String imageName = file.isEmpty() ? oldCategory.getImageName() : file.getOriginalFilename();
+        if (!file.isEmpty()) {
+
+            // Delete the old image from S3
+            if (oldCategory.getImageName() != null) {
+                fileService.deleteFileS3(oldCategory.getImageName(), BucketType.CATEGORY);
+            }
+
+            String imageUrl = commonUtils.generateImageUrl(file, BucketType.CATEGORY);
+            oldCategory.setImageName(imageUrl);
+        } else {
+            oldCategory.setImageName(oldCategory.getImageName());
+        }
 
         oldCategory.setName(category.getName());
-        oldCategory.setImageName(imageName);
         oldCategory.setIsActive(category.getIsActive());
 
         Category updatedCategory = categoryService.saveCategory(oldCategory);
 
         if (updatedCategory != null) {
             if (!file.isEmpty()) {
-                File saveDir = new ClassPathResource("static/image/category_img").getFile();
-                System.out.println("saveDir = " + saveDir.getAbsolutePath());
-                if (!saveDir.exists()) {
-                    saveDir.mkdirs();
-                }
-
-                Path path = Path.of(saveDir.getAbsolutePath(), imageName);
-                System.out.println("path = " + path);
-                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                fileService.uploadFileS3(file, BucketType.CATEGORY);
             }
-
             session.setAttribute("successMsg", "Category updated successfully");
         } else {
             session.setAttribute("errorMsg", "Failed to update category");
@@ -152,9 +153,5 @@ public class CategoryController {
 
         return "redirect:/admin/category";
     }
-
-
-
-
 
 }
