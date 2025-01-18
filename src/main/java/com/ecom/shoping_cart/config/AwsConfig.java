@@ -21,9 +21,7 @@ public class AwsConfig {
 
     @Bean
     public AmazonS3 amazonS3(){
-        System.out.println("accessKey: "+accessKey);
-        System.out.println("secretKey: "+secretKey);
-        System.out.println("region: "+region);
+
 
     BasicAWSCredentials credentials=  new BasicAWSCredentials(accessKey, secretKey);
 
